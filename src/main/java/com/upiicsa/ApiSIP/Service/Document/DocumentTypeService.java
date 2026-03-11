@@ -21,7 +21,6 @@ public class DocumentTypeService {
     }
 
     public List<DocumentType> getRequiredTypes(StudentProcess process){
-
         return docProcessRepository.findDocumentTypesByProcessState(process.getProcessState());
     }
 
