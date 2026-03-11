@@ -9,14 +9,12 @@ import com.upiicsa.ApiSIP.Model.Student;
 import com.upiicsa.ApiSIP.Model.Document_Process.StudentProcess;
 import com.upiicsa.ApiSIP.Repository.Catalogs.ProcessStateRepository;
 import com.upiicsa.ApiSIP.Repository.Document_Process.StudentProcessRepository;
-import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 
 @Service
 public class StudentProcessService {
@@ -38,8 +36,8 @@ public class StudentProcessService {
                         .orElseThrow(()-> new ResourceNotFoundException("State not found"));
 
         StudentProcess firstProcess = StudentProcess.builder()
-                .StartDate(LocalDateTime.now())
-                .Active(true)
+                .startDate(LocalDateTime.now())
+                .active(true)
                 .student(student)
                 .processState(state)
                 .observations("")
@@ -49,32 +47,26 @@ public class StudentProcessService {
     }
 
     @Transactional
-    public void updateProcessStatus(Integer processId, StateProcessEnum nextProcess) {
-        StudentProcess process = processRepository.findById(processId)
-                .orElseThrow(() -> new EntityNotFoundException("Process not found"));
+    public void updateProcessStatus(StudentProcess process, StateProcessEnum nextProcess) {
 
         StateProcessEnum currentState = StateProcessEnum.fromId(process.getProcessState().getId());
 
-        boolean isValid = currentState.getNextId() == nextProcess.getId() ||
-                nextProcess == StateProcessEnum.CANCELLATION;
+        if (currentState.getNextId() == nextProcess.getId() ||
+                nextProcess == StateProcessEnum.CANCELLATION) {
+            ProcessState newState = processStateRepository.findByDescription(nextProcess.getName())
+                            .orElseThrow(() -> new ResourceNotFoundException("State not found"));
+            process.setProcessState(newState);
 
-        if (!isValid) {
+            historyService.saveHistory(process, currentState, nextProcess);
+            processRepository.save(process);
+        }else {
             throw new IllegalStateException("Transición no permitida");
         }
-
-        ProcessState newState = processStateRepository.findById(nextProcess.getId())
-                .orElseThrow(() -> new EntityNotFoundException("Estado no encontrado"));
-        process.setProcessState(newState);
-
-        processRepository.save(process);
-        historyService.saveHistory(process, currentState, nextProcess);
     }
 
     public List<ProcessProgressDto> getProcessHistory(Integer userId) {
-        StudentProcess process = processRepository.findByStudentId(userId)
-                .filter(StudentProcess::getActive)
-                .orElseThrow(() -> new RuntimeException("Proceso no encontrado"));
-
+        StudentProcess process = getByStudentId(userId);
+        int currentStageId = process.getProcessState().getId();
         List<History> history = historyService.getHistoriesByProcess(process);
 
         String[] stages = {
@@ -86,22 +78,25 @@ public class StudentProcessService {
 
         for (int i = 0; i < stages.length; i++) {
             int stageId = i + 1;
+            String date = "-";
 
-            Optional<History> entry = history.stream()
-                    .filter(h -> h.getProcess().getId() == stageId)
-                    .findFirst();
+            if (stageId == 1 && currentStageId > 1) {
+                date = process.getStartDate().toLocalDate().toString();
+            } else if (stageId > 1 && stageId < currentStageId) {
+                date = history.stream()
+                        .filter(h -> h.getProcess().getId().equals(stageId))
+                        .findFirst()
+                        .map(h -> h.getUpdateDate().toLocalDate().toString())
+                        .orElse("-");
+            }
 
-            String dateStr = entry.map(value -> value.getUpdateDate().toLocalDate().toString())
-                    .orElse("-");
-            boolean current = process.getProcessState().getId() == stageId;
-
-            progress.add(new ProcessProgressDto(stages[i], dateStr, current));
+            progress.add(new ProcessProgressDto(stages[i], date, stageId == currentStageId));
         }
         return progress;
     }
 
     public StudentProcess getByStudentId(Integer userId) {
-        return processRepository.findByStudentId(userId)
+        return processRepository.findByActiveIsTrueAndStudentId(userId)
                 .orElseThrow(()->new IllegalArgumentException("Process not found"));
     }
 }
