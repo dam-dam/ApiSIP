@@ -37,13 +37,10 @@ public class EmailVerificationService {
                 LocalDateTime.now().plusMinutes(30), null, user);
         confirmationCodeRepository.save(newCode);
 
-
         emailService.sendConfirmationCode(user.getEmail(), code);
 
-        System.out.println("\n------------------------------------------------------");
         System.out.println(">>> CÓDIGO DE CONFIRMACIÓN GENERADO: " + code);
         System.out.println(">>> ENVIADO A: " + user.getEmail());
-        System.out.println("------------------------------------------------------\n");
     }
 
     @Transactional
