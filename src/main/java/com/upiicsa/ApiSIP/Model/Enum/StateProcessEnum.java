@@ -6,7 +6,7 @@ public enum StateProcessEnum {
     REGISTERED(1, "Registrado", -1, 2),
     INITIAL_DOC(2, "Doc Inicial", 1, 3),
     ACCEPTANCE(3, "Carta Aceptacion", 2, 4),
-    FINAL_DOC(4, "Doc Final", 3, 0),
+    FINAL_DOC(4, "Doc Final", 3, -1),
     CANCELLATION(5, "Baja", -1, -1);
 
     @Getter
