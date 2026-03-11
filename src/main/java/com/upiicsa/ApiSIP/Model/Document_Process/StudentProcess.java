@@ -25,13 +25,13 @@ public class StudentProcess {
     private Integer id;
 
     @Column(name = "FECHA_INICIO")
-    private LocalDateTime StartDate;
+    private LocalDateTime startDate;
 
     @Column(name = "FECHA_FIN")
-    private LocalDateTime EndDate;
+    private LocalDateTime endDate;
 
     @Column(name = "ACTIVO")
-    private Boolean Active;
+    private Boolean active;
 
     @ManyToOne
     @JoinColumn(name = "ID_USUARIO")
