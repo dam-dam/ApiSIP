@@ -201,6 +201,10 @@ input:focus, select:focus { border-color: var(--primary); background: white; box
     padding: 2rem;
 }
 
+.error-text{
+    color: red;
+}
+
 .btn-download {
     background: var(--text-main);
     color: white;

@@ -97,6 +97,7 @@ function fillFormData(data) {
 function setupForm() {
     const form = document.getElementById('cedulaForm');
     const btn = document.getElementById('submitBtn');
+    let esValido = true;
 
     if(!form) return;
 
@@ -116,6 +117,26 @@ function setupForm() {
                 console.error("No se encontró el elemento con ID:", id);
                 return;
             }
+        }
+
+        // Validamos uno por uno
+        for(let id of requiredFields) {
+            const el = document.getElementById(id);
+
+            if (!validarCampo(el)) {
+                esValido = false;
+            }
+        }
+
+        if (!esValido) {
+            Swal.fire({
+                title: "Error",
+                text: "Uno o varios campos incorrectos, favor de revisar",
+                icon: "error",
+                confirmButtoText: "Continuar"
+            })
+            //alert("Por favor, corrige los errores antes de continuar.");
+            return;
         }
 
         btn.disabled = true;
@@ -160,14 +181,38 @@ function setupForm() {
 
             if (response.ok) {
                 await loadPdfPreview();
-                alert("Cédula generada correctamente.");
+                Swal.fire({
+                    title: "Error",
+                    text: "Uno o varios campos incorrectos, favor de revisar",
+                    icon: "error",
+                    confirmButtoText: "Continuar"
+                })
+                let timerInterval;
+                Swal.fire(
+                    "Exito",
+                    "Tus cédula fue generada correctamente",
+                    "success"
+                )
+                //alert("Cédula generada correctamente.");
             } else {
                 const errText = await response.text();
-                alert("Error al procesar: " + errText);
+                Swal.fire({
+                    title: "Error",
+                    text: "Error al procesar: " + errText,
+                    icon: "error",
+                    confirmButtoText: "Continuar"
+                })
+                //alert("Error al procesar: " + errText);
             }
         } catch (error) {
             console.error("Error:", error);
-            alert("Sin conexión al servidor.");
+            Swal.fire({
+                title: "Error",
+                text: "Sin conexión al servidor ",
+                icon: "error",
+                confirmButtoText: "Continuar"
+            })
+            //alert("Sin conexión al servidor.");
         } finally {
             btn.disabled = false;
             btn.textContent = "Generar PDF de Cédula";
@@ -201,4 +246,26 @@ function setupLogout() {
             if (response.ok) window.location.href = '/index.html';
         } catch (error) { console.error("Error al cerrar sesión."); }
     });
+}
+
+//Valida que los campos no esten vacios
+function validarCampo(inputElement) {
+    const errorId = `error-${inputElement.id}`;
+    let errorElement = document.getElementById(errorId);
+
+    if (!inputElement.value || inputElement.value.trim() === '') {
+        if (!errorElement) {
+            errorElement = document.createElement('small');
+            errorElement.id = errorId;
+            errorElement.className = 'error-text';
+            errorElement.textContent = 'Este campo no puede ir vacío';
+            inputElement.parentNode.insertBefore(errorElement, inputElement.nextSibling);
+        }
+        inputElement.classList.add('input-error');
+        return false;
+    } else {
+        if (errorElement) errorElement.remove();
+        inputElement.classList.remove('input-error');
+        return true;
+    }
 }
