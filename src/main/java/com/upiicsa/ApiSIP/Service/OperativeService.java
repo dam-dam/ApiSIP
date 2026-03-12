@@ -32,8 +32,9 @@ public class OperativeService {
 
         if(careerAcronym.equals("all")){
             students = studentRepository.findAll();
+        }else {
+            students = studentRepository.findAllByCareerAcronym(careerAcronym);
         }
-        students = studentRepository.findAllByCareerAcronym(careerAcronym);
 
         Map<String, Long> counts = students.stream()
                 .map(student -> processRepository.findByActiveIsTrueAndStudentId(student.getId()).orElse(null))

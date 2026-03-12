@@ -8,14 +8,11 @@ import com.upiicsa.ApiSIP.Repository.*;
 import com.upiicsa.ApiSIP.Service.Auth.EmailVerificationService;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
 
 @Service
 public class StudentService {
