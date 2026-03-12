@@ -1,5 +1,6 @@
 package com.upiicsa.ApiSIP.Service;
 
+import com.upiicsa.ApiSIP.Dto.Student.ResponseStudentDto;
 import com.upiicsa.ApiSIP.Dto.Student.StudentRegistrationDto;
 import com.upiicsa.ApiSIP.Exception.ValidationException;
 import com.upiicsa.ApiSIP.Model.Student;
@@ -7,11 +8,14 @@ import com.upiicsa.ApiSIP.Repository.*;
 import com.upiicsa.ApiSIP.Service.Auth.EmailVerificationService;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 @Service
 public class StudentService {
@@ -32,8 +36,13 @@ public class StudentService {
         this.processService = processService;
     }
 
-    public Page<Student> getStudents(Pageable pageable) {
-        return studentRepository.findAll(pageable);
+    public Page<ResponseStudentDto> getStudents(Pageable pageable) {
+        Page<Student> studentPage = studentRepository.findAll(pageable);
+
+        return studentPage.map(student -> new ResponseStudentDto(
+                student.getName(), student.getFLastName(), student.getMLastName(),
+                student.getEnrollment(), student.getOffer()
+        ));
     }
 
     @Transactional

@@ -1,8 +1,8 @@
 package com.upiicsa.ApiSIP.Controller;
 
 import com.upiicsa.ApiSIP.Dto.DashboardStatsDto;
+import com.upiicsa.ApiSIP.Dto.Student.ResponseStudentDto;
 import com.upiicsa.ApiSIP.Dto.Student.StudentReviewDto;
-import com.upiicsa.ApiSIP.Model.Student;
 import com.upiicsa.ApiSIP.Service.OperativeService;
 import com.upiicsa.ApiSIP.Service.StudentService;
 import org.springframework.data.domain.Page;
@@ -27,8 +27,8 @@ public class OperativeController {
 
     @RequestMapping("/get-allStudents")
     @PreAuthorize("hasAnyRole('ADMINISTRADOR', 'OPERADOR')")
-    public ResponseEntity<Page<Student>> getAllStudents(Pageable pageable) {
-        Page<Student> students = studentService.getStudents(pageable);
+    public ResponseEntity<Page<ResponseStudentDto>> getAllStudents(Pageable pageable) {
+        Page<ResponseStudentDto> students = studentService.getStudents(pageable);
 
         return ResponseEntity.ok(students);
     }
