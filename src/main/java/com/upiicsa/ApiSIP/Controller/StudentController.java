@@ -3,7 +3,7 @@ package com.upiicsa.ApiSIP.Controller;
 import com.upiicsa.ApiSIP.Dto.ProcessProgressDto;
 import com.upiicsa.ApiSIP.Dto.Student.StudentRegistrationDto;
 import com.upiicsa.ApiSIP.Model.Student;
-import com.upiicsa.ApiSIP.Service.StudentProcessService;
+import com.upiicsa.ApiSIP.Service.Document.StudentProcessService;
 import com.upiicsa.ApiSIP.Service.StudentService;
 import com.upiicsa.ApiSIP.Utils.AuthHelper;
 import jakarta.validation.Valid;

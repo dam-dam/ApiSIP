@@ -1,4 +1,4 @@
-package com.upiicsa.ApiSIP.Service;
+package com.upiicsa.ApiSIP.Service.Document;
 
 import com.upiicsa.ApiSIP.Dto.ProcessProgressDto;
 import com.upiicsa.ApiSIP.Exception.ResourceNotFoundException;
@@ -9,6 +9,7 @@ import com.upiicsa.ApiSIP.Model.Student;
 import com.upiicsa.ApiSIP.Model.Document_Process.StudentProcess;
 import com.upiicsa.ApiSIP.Repository.Catalogs.ProcessStatusRepository;
 import com.upiicsa.ApiSIP.Repository.Document_Process.StudentProcessRepository;
+import com.upiicsa.ApiSIP.Service.HistoryService;
 import jakarta.transaction.Transactional;
 import org.springframework.stereotype.Service;
 

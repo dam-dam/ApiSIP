@@ -21,7 +21,7 @@ public class PasswordResetService {
 
     private UserRepository userRepository;
     private TokenResetRepository tokenResetRepository;
-    private PasswordEncoder  passwordEncoder;
+    private PasswordEncoder passwordEncoder;
     private EmailService emailService;
 
     public PasswordResetService(UserRepository userRepository, TokenResetRepository tokenResetRepository,

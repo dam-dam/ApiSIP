@@ -9,6 +9,7 @@ import java.time.LocalDateTime;
 @Getter @Setter
 @AllArgsConstructor
 @NoArgsConstructor
+@Builder
 @Entity
 @Table(name = "SIP_REVISIONDOC")
 public class DocumentReview {

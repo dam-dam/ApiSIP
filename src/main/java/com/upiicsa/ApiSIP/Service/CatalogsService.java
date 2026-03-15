@@ -46,23 +46,26 @@ public class CatalogsService {
                 .map(school -> new SchoolDto(school))
                 .toList();
     }
-    //Career
-    public List<CareerDto> getCareers(String acronym) {
-        School schoolOpt = schoolRepository.findSchoolByAcronym(acronym)
-                .orElseThrow(()-> new EntityNotFoundException("School with acronym " + acronym + " not found"));
+    public School getSchool(String schoolAcronym){
+        return schoolRepository.findSchoolByAcronym(schoolAcronym)
+                .orElseThrow(()-> new EntityNotFoundException("School with acronym " + schoolAcronym + " not found"));
+    }
 
-        return offerRepository.findCareersBySchool(schoolOpt.getId()).stream()
+    //Career
+    public List<CareerDto> getCareers(String schoolAcronym) {
+        return offerRepository.findBySchool(getSchool(schoolAcronym)).stream()
                 .map(career -> new CareerDto(career))
                 .toList();
     }
+
+    public Career getCareer(String careerAcronym) {
+        return careerRepository.findCareerByAcronym(careerAcronym)
+                .orElseThrow(() -> new EntityNotFoundException("Career with acronym" + careerAcronym + " not found"));
+    }
     //Syllabus
     public List<SyllabusDto> getSyllabuses(String schoolAcronym, String careerAcronym) {
-        School schoolOpt = schoolRepository.findSchoolByAcronym(schoolAcronym)
-                .orElseThrow(()-> new EntityNotFoundException("School with acronym " + schoolAcronym + " not found"));
-        Career careerOpt = careerRepository.findCareerByAcronym(careerAcronym)
-                .orElseThrow(() -> new EntityNotFoundException("Career with acronym" + careerAcronym + " not found"));
-
-        return offerRepository.findSyllabusBySchoolAndCareer(schoolOpt.getId(), careerOpt.getId()).stream()
+        return offerRepository.findBySchoolAndCareer(getSchool(schoolAcronym), getCareer(careerAcronym))
+                .stream()
                 .map(syllabus -> new SyllabusDto(syllabus))
                 .toList();
     }
@@ -70,8 +73,7 @@ public class CatalogsService {
     public Offer getOffer(StudentRegistrationDto  registrationDto) {
         return offerRepository.findByCompositeKeys(
                         registrationDto.schoolName(), registrationDto.acronymCareer(), registrationDto.syllabusCode())
-                .orElseThrow(() -> new ResourceNotFoundException("OfertaAca not found"));
-
+                .orElseThrow(() -> new ResourceNotFoundException("Offer not found"));
     }
     //Semester
     public Semester getSemester(StudentRegistrationDto registrationDto) {
@@ -92,12 +94,12 @@ public class CatalogsService {
     //UserType
     public UserType getType(String type) {
         return typeRepository.findByDescription(type)
-                .orElseThrow(() -> new ResourceNotFoundException("Tipo de Usuario not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("UserType not found"));
     }
     //Status
     public Status getStatus(String status) {
         return statusRepository.findByDescription(status)
-                .orElseThrow(() -> new ResourceNotFoundException("Estatus not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("Status not found"));
     }
     //State
     public List<StateDto> getStates() {

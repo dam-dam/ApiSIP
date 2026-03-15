@@ -14,7 +14,6 @@ import com.upiicsa.ApiSIP.Repository.Document_Process.DocumentReviewRepository;
 import com.upiicsa.ApiSIP.Repository.Document_Process.DocumentStatusRepository;
 import com.upiicsa.ApiSIP.Repository.UserRepository;
 import com.upiicsa.ApiSIP.Service.Infrastructure.FileStorageService;
-import com.upiicsa.ApiSIP.Service.StudentProcessService;
 import com.upiicsa.ApiSIP.Utils.DocumentNamingUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -49,6 +48,13 @@ public class DocumentService {
         this.processService = processService;
         this.documentNaming = documentNaming;
         this.fileStorage = fileStorage;
+    }
+
+    public Optional<Document> getDocByProcessAndDocumentType(StudentProcess process, String typeName){
+        DocumentType type = docTypeService.getByDescription(typeName);
+
+        return documentRepository.findByStudentProcessAndDocumentTypeAndCancellationDateIsNull(process,
+                type);
     }
 
     @Transactional

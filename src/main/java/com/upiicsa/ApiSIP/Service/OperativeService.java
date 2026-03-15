@@ -2,11 +2,17 @@ package com.upiicsa.ApiSIP.Service;
 
 import com.upiicsa.ApiSIP.Dto.DashboardStatsDto;
 import com.upiicsa.ApiSIP.Dto.Document.DocumentStatusDto;
+import com.upiicsa.ApiSIP.Dto.ReviewDto;
 import com.upiicsa.ApiSIP.Dto.Student.StudentReviewDto;
+import com.upiicsa.ApiSIP.Model.Document_Process.Document;
+import com.upiicsa.ApiSIP.Model.Document_Process.StudentProcess;
 import com.upiicsa.ApiSIP.Model.Student;
+import com.upiicsa.ApiSIP.Model.UserSIP;
 import com.upiicsa.ApiSIP.Repository.Document_Process.StudentProcessRepository;
 import com.upiicsa.ApiSIP.Repository.StudentRepository;
+import com.upiicsa.ApiSIP.Repository.UserRepository;
 import com.upiicsa.ApiSIP.Service.Document.DocumentService;
+import com.upiicsa.ApiSIP.Service.Document.ReviewDocumentService;
 import jakarta.persistence.EntityNotFoundException;
 import org.springframework.stereotype.Service;
 
@@ -18,13 +24,18 @@ public class OperativeService {
 
     private StudentRepository studentRepository;
     private StudentProcessRepository processRepository;
+    private UserRepository userRepository;
     private DocumentService documentService;
+    private ReviewDocumentService reviewService;
 
     public OperativeService(StudentRepository studentRepository, StudentProcessRepository processRepository,
-                            DocumentService documentService) {
+                            UserRepository userRepository, DocumentService documentService,
+                            ReviewDocumentService reviewService) {
         this.studentRepository = studentRepository;
         this.processRepository = processRepository;
+        this.userRepository = userRepository;
         this.documentService = documentService;
+        this.reviewService = reviewService;
     }
 
     public DashboardStatsDto getStats(String careerAcronym){
@@ -70,5 +81,15 @@ public class OperativeService {
 
         return new StudentReviewDto(fullName, student.getEnrollment(), student.getOffer().getCareer().getName(),
                 semester, student.getOffer().getSyllabus().code, documents);
+    }
+
+    public void performReview(ReviewDto reviewDto, Integer userId){
+        StudentProcess process = processRepository.findByStudentEnrollmentAndReasonLeavingIsNull(
+                reviewDto.studentEnrollment()).orElse(null);
+        Document doc = documentService.getDocByProcessAndDocumentType(process, reviewDto.typeName())
+                .orElseThrow(() -> new EntityNotFoundException("Document not found"));
+        UserSIP user = userRepository.findById(userId).orElseThrow(() -> new EntityNotFoundException("User not found"));
+
+        reviewService.save(doc, user, reviewDto.approved(), reviewDto.comment());
     }
 }
