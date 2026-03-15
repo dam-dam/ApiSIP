@@ -9,10 +9,10 @@ import lombok.*;
 @NoArgsConstructor
 @Getter @Setter
 @Entity
-@Table(name = "SIP_CTIPODOC")
+@Table(name = "SIP_CTIPO_DOC")
 public class DocumentType extends BaseCatalog{
 
     @Id
-    @Column(name = "ID_TIPODOC")
+    @Column(name = "ID_TIPO_DOC")
     private Integer id;
 }

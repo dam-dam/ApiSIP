@@ -15,17 +15,17 @@ import lombok.experimental.SuperBuilder;
 @PrimaryKeyJoinColumn(name = "ID_USUARIO")
 public class Student extends UserSIP {
 
-    @Column(name = "MATRICULA", length = 20, unique = true)
+    @Column(name = "MATRICULA", length = 20, nullable = false, unique = true)
     private String enrollment;
 
-    @Column(name = "TELEFONO", length = 20)
+    @Column(name = "TELEFONO", length = 20, nullable = false, unique = true)
     private String phone;
 
     @ManyToOne
     @JoinColumn(name = "ID_SEMESTRE")
     private Semester semester;
 
-    @Column(name = "EGRESADO")
+    @Column(name = "EGRESADO", nullable = false)
     private boolean graduate;
 
     @ManyToOne
@@ -33,6 +33,6 @@ public class Student extends UserSIP {
     private Address address;
 
     @ManyToOne
-    @JoinColumn(name = "ID_OFERTA")
+    @JoinColumn(name = "ID_OFERTA", nullable = false)
     private Offer offer;
 }

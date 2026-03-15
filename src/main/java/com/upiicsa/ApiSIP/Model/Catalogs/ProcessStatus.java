@@ -9,10 +9,10 @@ import lombok.*;
 @NoArgsConstructor
 @Getter @Setter
 @Entity
-@Table(name = "SIP_CESTPROCESO")
-public class ProcessState extends BaseCatalog{
+@Table(name = "SIP_CEST_PROCESO")
+public class ProcessStatus extends BaseCatalog{
 
     @Id
-    @Column(name = "ID_ESTPROCESO")
+    @Column(name = "ID_EST_PROCESO")
     private Integer id;
 }

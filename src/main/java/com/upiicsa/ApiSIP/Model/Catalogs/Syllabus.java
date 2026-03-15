@@ -15,6 +15,6 @@ public class Syllabus {
     @Column(name = "ID_PLAN_EST")
     public Integer id;
 
-    @Column(name = "CODIGO")
+    @Column(name = "CODIGO",  length = 20, nullable = false,  unique = true)
     public String code;
 }

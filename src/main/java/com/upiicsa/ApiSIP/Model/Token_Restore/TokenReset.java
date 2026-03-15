@@ -18,10 +18,10 @@ public class TokenReset {
     @Column(name = "ID_TOKEN_RESETEO")
     private Integer id;
 
-    @Column(name = "TOKEN", length = 200)
+    @Column(name = "TOKEN", length = 200, nullable = false,  unique = true)
     private String token;
 
-    @Column(name = "FECHA_EXPIRACION")
+    @Column(name = "FECHA_EXPIRACION", nullable = false)
     private LocalDateTime ExpirationDate;
 
     @Column(name = "FECHA_USO")

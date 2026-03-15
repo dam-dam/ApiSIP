@@ -37,10 +37,11 @@ public class OperativeService {
         }
 
         Map<String, Long> counts = students.stream()
-                .map(student -> processRepository.findByActiveIsTrueAndStudentId(student.getId()).orElse(null))
+                .map(student -> processRepository.findByStudentIdAndReasonLeavingIsNull
+                        (student.getId()).orElse(null))
                 .filter(Objects::nonNull)
                 .collect(Collectors.groupingBy(
-                        process -> process.getProcessState().getDescription(),
+                        process -> process.getProcessStatus().getDescription(),
                         Collectors.counting()
                 ));
 

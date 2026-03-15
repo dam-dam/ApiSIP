@@ -1,6 +1,6 @@
 package com.upiicsa.ApiSIP.Model.Document_Process;
 
-import com.upiicsa.ApiSIP.Model.Catalogs.ProcessState;
+import com.upiicsa.ApiSIP.Model.Catalogs.ProcessStatus;
 import com.upiicsa.ApiSIP.Model.Company;
 import com.upiicsa.ApiSIP.Model.Student;
 import jakarta.persistence.*;
@@ -16,7 +16,7 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @Entity
 @Builder
-@Table(name = "SIP_PROCESO")
+@Table(name = "SIP_PROCESOS")
 public class StudentProcess {
 
     @Id
@@ -24,25 +24,22 @@ public class StudentProcess {
     @Column(name = "ID_PROCESO")
     private Integer id;
 
-    @Column(name = "FECHA_INICIO")
+    @ManyToOne
+    @JoinColumn(name = "ID_ALUMNO")
+    private Student student;
+
+    @Column(name = "FECHA_INICIO", nullable = false)
     private LocalDateTime startDate;
 
     @Column(name = "FECHA_FIN")
     private LocalDateTime endDate;
 
-    @Column(name = "ACTIVO")
-    private Boolean active;
-
     @ManyToOne
-    @JoinColumn(name = "ID_USUARIO")
-    private Student student;
+    @JoinColumn(name = "ESTADO_ACTUAL", referencedColumnName = "ID_EST_PROCESO", nullable = false)
+    private ProcessStatus processStatus;
 
-    @ManyToOne
-    @JoinColumn(name = "ESTADO_ACTUAL", referencedColumnName = "ID_ESTPROCESO")
-    private ProcessState processState;
-
-    @Column(name = "OBSERVACIONES", length = 150)
-    private String observations;
+    @Column(name = "MOTIVO_BAJA", length = 200)
+    private String reasonLeaving;
 
     @ManyToOne
     @JoinColumn(name = "ID_EMPRESA")

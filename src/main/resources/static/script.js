@@ -137,7 +137,7 @@ async function cargarCatalogosIniciales() {
 
         schools.forEach(s => {
             const op = new Option(s.acronym, s.acronym);
-            op.dataset.name = s.name;
+            op.dataset.name = s.acronym;
             escuelaSel.add(op);
         });
 

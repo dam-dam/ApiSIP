@@ -16,10 +16,10 @@ public class DurationToken {
     @Column(name = "ID_DURACION")
     private Integer id;
 
-    @Column(name = "DURACION_HORAS")
+    @Column(name = "DURACION_HORAS", nullable = false)
     private Integer hours;
 
     @ManyToOne
-    @JoinColumn(name = "ID_TIPOUSUARIO")
+    @JoinColumn(name = "ID_TIPO_USUARIO",  nullable = false)
     private UserType user;
 }

@@ -16,13 +16,13 @@ import java.util.Optional;
 public interface OfferRepository extends JpaRepository<Offer, Integer> {
 
     @Query("SELECT o FROM Offer o " +
-            "WHERE o.school.name = :nameSchool " +
-            "AND o.career.acronym = :acronymCareer " +
-            "AND o.syllabus.code = :codeSyllabus")
+            "WHERE o.school.acronym = :schoolAcronym " +
+            "AND o.career.acronym = :careerAcronym " +
+            "AND o.syllabus.code = :syllabusCode")
     Optional<Offer> findByCompositeKeys(
-            @Param("nameSchool") String school,
-            @Param("acronymCareer") String career,
-            @Param("codeSyllabus") String syllabus
+            @Param("schoolAcronym") String school,
+            @Param("careerAcronym") String career,
+            @Param("syllabusCode") String syllabus
     );
 
     @Query("SELECT DISTINCT o.school FROM Offer o")

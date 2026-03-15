@@ -17,7 +17,7 @@ public class Address {
     @Column(name = "ID_DIRECCION")
     private Integer id;
 
-    @Column(name = "CALLE", length = 100)
+    @Column(name = "CALLE", length = 100, nullable = false)
     private String street;
 
     @Column(name = "NUMERO", length = 5)

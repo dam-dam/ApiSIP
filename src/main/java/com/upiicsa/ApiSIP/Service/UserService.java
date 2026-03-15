@@ -44,7 +44,7 @@ public class UserService {
                     : student.getSemester().getDescription();
             InfoInstitutionalDto institutionalDto =  new InfoInstitutionalDto(student.getEnrollment(),
                     student.getOffer().getCareer().getName(), student.getOffer().getSyllabus().getCode(),
-                    semester, process.getProcessState().getDescription());
+                    semester, process.getProcessStatus().getDescription());
 
             profileDto = new ProfileDto(user.getName(), user.getFLastName(), user.getMLastName(), user.getEmail(),
                     student.getPhone(), institutionalDto);

@@ -1,21 +1,21 @@
 package com.upiicsa.ApiSIP.Service.Document;
 
-import com.upiicsa.ApiSIP.Model.Document_Process.ReviewDocument;
-import com.upiicsa.ApiSIP.Repository.Document_Process.ReviewDocumentRepository;
+import com.upiicsa.ApiSIP.Model.Document_Process.DocumentReview;
+import com.upiicsa.ApiSIP.Repository.Document_Process.DocumentReviewRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 @Service
 public class ReviewDocumentService {
 
-    public final ReviewDocumentRepository reviewDocumentRepository;
+    public final DocumentReviewRepository documentReviewRepository;
 
-    public ReviewDocumentService(ReviewDocumentRepository reviewDocumentRepository) {
-        this.reviewDocumentRepository = reviewDocumentRepository;
+    public ReviewDocumentService(DocumentReviewRepository documentReviewRepository) {
+        this.documentReviewRepository = documentReviewRepository;
     }
 
     @Transactional
-    public void save(ReviewDocument reviewDocument) {
-        reviewDocumentRepository.save(reviewDocument);
+    public void save(DocumentReview documentReview) {
+        documentReviewRepository.save(documentReview);
     }
 }

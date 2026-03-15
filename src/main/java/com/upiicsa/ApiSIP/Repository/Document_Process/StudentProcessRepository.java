@@ -9,5 +9,5 @@ import java.util.Optional;
 @Repository
 public interface StudentProcessRepository extends JpaRepository<StudentProcess, Integer> {
 
-    Optional<StudentProcess> findByActiveIsTrueAndStudentId(Integer userId);
+    Optional<StudentProcess> findByStudentIdAndReasonLeavingIsNull(Integer studentId);
 }

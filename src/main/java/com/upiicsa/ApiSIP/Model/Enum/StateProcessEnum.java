@@ -3,11 +3,12 @@ package com.upiicsa.ApiSIP.Model.Enum;
 import lombok.Getter;
 
 public enum StateProcessEnum {
-    REGISTERED(1, "Registrado", -1, 2),
-    INITIAL_DOC(2, "Doc Inicial", 1, 3),
-    ACCEPTANCE(3, "Carta Aceptacion", 2, 4),
-    FINAL_DOC(4, "Doc Final", 3, -1),
-    CANCELLATION(5, "Baja", -1, -1);
+    REGISTERED(1, "REGISTRADO", -1, 2),
+    INITIAL_DOC(2, "DOC_INICIAL", 1, 3),
+    LETTERS(3, "CARTAS", 2, 4),
+    FINAL_DOC(4, "DOC_FINAL", 3, 5),
+    RELEASED(5, "LIBERADO", 4, -1),
+    CANCELLATION(6, "BAJA", -1, -1);
 
     @Getter
     private int id;

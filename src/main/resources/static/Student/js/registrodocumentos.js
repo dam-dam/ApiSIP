@@ -4,11 +4,11 @@ const DOC_PATH = '/view-documents/';
 
 // Mapeo exacto según tu catálogo de backend
 const DOC_CONFIG = [
-    { id: 'cedula', label: 'Cédula de Registro', typeCode: 'Cedula de Registro' },
-    { id: 'imss', label: 'Constancia de Vigencia (IMSS)', typeCode: 'Constancia de Vigencia' },
-    { id: 'sisae-empresa', label: 'Captura Empresa (SISAE)', typeCode: 'Captura de Empresa' },
-    { id: 'sisae-alumno', label: 'Captura Alumno (SISAE)', typeCode: 'Captura de Alumno' },
-    { id: 'horario', label: 'Copia de Horario (SAES)', typeCode: 'Copia de Horario' }
+    { id: 'cedula', label: 'Cédula de Registro', typeCode: 'CEDULA_REGISTRO' },
+    { id: 'imss', label: 'Constancia de Vigencia (IMSS)', typeCode: 'CONSTANCIA_IMSS' },
+    { id: 'sisae-empresa', label: 'Captura Empresa (SISAE)', typeCode: 'CAPTURA_EMPRESA' },
+    { id: 'sisae-alumno', label: 'Captura Alumno (SISAE)', typeCode: 'CAPTURA_ALUMNO' },
+    { id: 'horario', label: 'Copia de Horario (SAES)', typeCode: 'HORARIO' }
 ];
 
 document.addEventListener('DOMContentLoaded', () => {

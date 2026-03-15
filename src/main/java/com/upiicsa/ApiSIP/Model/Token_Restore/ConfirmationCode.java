@@ -18,10 +18,10 @@ public class ConfirmationCode {
     @Column(name = "ID_CODIGO_CONFIRM")
     private Integer id;
 
-    @Column(name = "CODIGO", length = 10)
+    @Column(name = "CODIGO", length = 10, nullable = false, unique = true)
     private String code;
 
-    @Column(name = "FECHA_EXPIRACION")
+    @Column(name = "FECHA_EXPIRACION", nullable = false)
     private LocalDateTime expirationDate;
 
     @Column(name = "FECHA_USO")

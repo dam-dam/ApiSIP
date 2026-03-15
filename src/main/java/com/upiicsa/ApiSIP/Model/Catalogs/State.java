@@ -17,6 +17,6 @@ public class State {
     @Column(name = "ID_EDO")
     private Integer id;
 
-    @Column(name = "NOMBRE")
+    @Column(name = "NOMBRE", nullable = false, unique = true)
     private String name;
 }

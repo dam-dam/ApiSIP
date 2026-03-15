@@ -2,12 +2,12 @@ package com.upiicsa.ApiSIP.Service;
 
 import com.upiicsa.ApiSIP.Dto.ProcessProgressDto;
 import com.upiicsa.ApiSIP.Exception.ResourceNotFoundException;
-import com.upiicsa.ApiSIP.Model.Catalogs.ProcessState;
+import com.upiicsa.ApiSIP.Model.Catalogs.ProcessStatus;
 import com.upiicsa.ApiSIP.Model.Enum.StateProcessEnum;
 import com.upiicsa.ApiSIP.Model.History;
 import com.upiicsa.ApiSIP.Model.Student;
 import com.upiicsa.ApiSIP.Model.Document_Process.StudentProcess;
-import com.upiicsa.ApiSIP.Repository.Catalogs.ProcessStateRepository;
+import com.upiicsa.ApiSIP.Repository.Catalogs.ProcessStatusRepository;
 import com.upiicsa.ApiSIP.Repository.Document_Process.StudentProcessRepository;
 import jakarta.transaction.Transactional;
 import org.springframework.stereotype.Service;
@@ -20,27 +20,26 @@ import java.util.List;
 public class StudentProcessService {
 
     private StudentProcessRepository processRepository;
-    private ProcessStateRepository processStateRepository;
+    private ProcessStatusRepository processStatusRepository;
     private HistoryService historyService;
 
-    public StudentProcessService(StudentProcessRepository processRepository, ProcessStateRepository processStateRepository,
+    public StudentProcessService(StudentProcessRepository processRepository, ProcessStatusRepository processStatusRepository,
                                  HistoryService historyService) {
         this.processRepository = processRepository;
-        this.processStateRepository = processStateRepository;
+        this.processStatusRepository = processStatusRepository;
         this.historyService = historyService;
     }
 
     @Transactional
     public void setFirstState(Student student) {
-        var state = processStateRepository.findByDescription(StateProcessEnum.REGISTERED.getName())
+        var state = processStatusRepository.findByDescription(StateProcessEnum.REGISTERED.getName())
                         .orElseThrow(()-> new ResourceNotFoundException("State not found"));
 
         StudentProcess firstProcess = StudentProcess.builder()
                 .startDate(LocalDateTime.now())
-                .active(true)
                 .student(student)
-                .processState(state)
-                .observations("")
+                .processStatus(state)
+                .reasonLeaving(null)
                 .build();
 
         processRepository.save(firstProcess);
@@ -49,13 +48,13 @@ public class StudentProcessService {
     @Transactional
     public void updateProcessStatus(StudentProcess process, StateProcessEnum nextProcess) {
 
-        StateProcessEnum currentState = StateProcessEnum.fromId(process.getProcessState().getId());
+        StateProcessEnum currentState = StateProcessEnum.fromId(process.getProcessStatus().getId());
 
         if (currentState.getNextId() == nextProcess.getId() ||
                 nextProcess == StateProcessEnum.CANCELLATION) {
-            ProcessState newState = processStateRepository.findByDescription(nextProcess.getName())
+            ProcessStatus newState = processStatusRepository.findByDescription(nextProcess.getName())
                             .orElseThrow(() -> new ResourceNotFoundException("State not found"));
-            process.setProcessState(newState);
+            process.setProcessStatus(newState);
 
             historyService.saveHistory(process, currentState, nextProcess);
             processRepository.save(process);
@@ -66,7 +65,7 @@ public class StudentProcessService {
 
     public List<ProcessProgressDto> getProcessHistory(Integer userId) {
         StudentProcess process = getByStudentId(userId);
-        int currentStageId = process.getProcessState().getId();
+        int currentStageId = process.getProcessStatus().getId();
         List<History> history = historyService.getHistoriesByProcess(process);
 
         String[] stages = {
@@ -96,7 +95,7 @@ public class StudentProcessService {
     }
 
     public StudentProcess getByStudentId(Integer userId) {
-        return processRepository.findByActiveIsTrueAndStudentId(userId)
+        return processRepository.findByStudentIdAndReasonLeavingIsNull(userId)
                 .orElseThrow(()->new IllegalArgumentException("Process not found"));
     }
 }

@@ -15,6 +15,6 @@ public class Permission {
     @Column(name = "ID_PERMISO")
     private Integer id;
 
-    @Column(name = "DESCRIPCION", length = 80)
+    @Column(name = "DESCRIPCION", length = 80, nullable = false, unique = true)
     private String description;
 }

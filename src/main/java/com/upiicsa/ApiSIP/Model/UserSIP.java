@@ -27,32 +27,32 @@ public class UserSIP implements UserDetails {
     @Column(name = "ID_USUARIO")
     private Integer id;
 
-    @Column(name = "NOMBRE", length = 60)
+    @Column(name = "NOMBRE", length = 60, nullable = false)
     private String name;
 
-    @Column(name = "PATERNO", length = 60)
+    @Column(name = "PATERNO", length = 60, nullable = false)
     private String fLastName;
 
-    @Column(name = "MATERNO", length = 60)
+    @Column(name = "MATERNO", length = 60, nullable = false)
     private String mLastName;
 
-    @Column(name = "CORREO", length = 100, unique = true)
+    @Column(name = "CORREO", length = 100, nullable = false, unique = true)
     private String email;
 
-    @Column(name = "CONTRASENA", length = 100)
+    @Column(name = "CONTRASENA", nullable = false)
     private String password;
 
-    @Column(name = "HABILITADO")
+    @Column(name = "HABILITADO", nullable = false)
     private Boolean enabled;
 
-    @Column(name = "FECHA_ALTA")
+    @Column(name = "FECHA_ALTA", nullable = false)
     private LocalDateTime registrationDate;
 
     @Column(name = "FECHA_BAJA")
     private LocalDateTime cancellationDate;
 
     @ManyToOne
-    @JoinColumn(name = "ID_TIPOUSUARIO")
+    @JoinColumn(name = "ID_TIPO_USUARIO")
     private UserType userType;
 
     @ManyToOne
@@ -62,12 +62,10 @@ public class UserSIP implements UserDetails {
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         Set<GrantedAuthority> authorities = new HashSet<>();
-        //Agregar permisos
         this.userType.getPermissions()
                 .stream()
                 .map(permiso ->  new SimpleGrantedAuthority(permiso.getDescription()))
                 .forEach(authorities::add);
-        //Agregar tipo de Usuario
         authorities.add(new SimpleGrantedAuthority("ROLE_" + this.userType.getDescription()));
 
         return authorities;

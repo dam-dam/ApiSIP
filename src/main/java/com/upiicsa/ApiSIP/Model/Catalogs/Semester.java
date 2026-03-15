@@ -7,7 +7,7 @@ import lombok.*;
 @AllArgsConstructor
 @Getter @Setter
 @Entity
-@Table(name = "SIP_CSEMESTRE")
+@Table(name = "SIP_SEMESTRES")
 public class Semester extends BaseCatalog{
 
     @Id

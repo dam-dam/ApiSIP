@@ -1,6 +1,6 @@
 package com.upiicsa.ApiSIP.Model;
 
-import com.upiicsa.ApiSIP.Model.Catalogs.ProcessState;
+import com.upiicsa.ApiSIP.Model.Catalogs.ProcessStatus;
 import com.upiicsa.ApiSIP.Model.Document_Process.StudentProcess;
 import jakarta.persistence.*;
 import lombok.*;
@@ -21,21 +21,21 @@ public class History {
     private Integer id;
 
     @ManyToOne
-    @JoinColumn(name = "ID_PROCESO")
+    @JoinColumn(name = "ID_PROCESO", nullable = false)
     private StudentProcess process;
 
     @ManyToOne
-    @JoinColumn(name = "ID_USUARIO")
+    @JoinColumn(name = "ID_USUARIO", nullable = false)
     private UserSIP user;
 
-    @Column(name = "FECHA_ACT")
+    @Column(name = "FECHA_ACT", nullable = false)
     private LocalDateTime updateDate;
 
     @ManyToOne
-    @JoinColumn(name = "ESTADO_NUEVO", referencedColumnName = "ID_ESTPROCESO")
-    private ProcessState newState;
+    @JoinColumn(name = "ESTADO_NUEVO", referencedColumnName = "ID_EST_PROCESO", nullable = false)
+    private ProcessStatus newState;
 
     @ManyToOne
-    @JoinColumn(name = "ESTADO_ANTERIOR", referencedColumnName = "ID_ESTPROCESO")
-    private ProcessState oldState;
+    @JoinColumn(name = "ESTADO_ANTERIOR", referencedColumnName = "ID_EST_PROCESO", nullable = false)
+    private ProcessStatus oldState;
 }

@@ -10,20 +10,20 @@ import java.util.Set;
 @AllArgsConstructor
 @NoArgsConstructor
 @Entity
-@Table(name = "SIP_CTIPOUSUARIO")
+@Table(name = "SIP_CTIPO_USUARIO")
 public class UserType {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "ID_TIPOUSUARIO")
+    @Column(name = "ID_TIPO_USUARIO")
     private Integer id;
 
-    @Column(name = "DESCRIPCION", length = 80)
+    @Column(name = "DESCRIPCION", length = 80,  nullable = false, unique = true)
     private String description;
 
     @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(name = "SIP_TIPO_PERMISOS",
-            joinColumns = @JoinColumn(name = "ID_TIPOUSUARIO"),
+            joinColumns = @JoinColumn(name = "ID_TIPO_USUARIO"),
             inverseJoinColumns = @JoinColumn(name = "ID_PERMISO")
     )
     @ToString.Exclude

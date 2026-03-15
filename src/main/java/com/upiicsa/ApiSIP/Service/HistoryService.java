@@ -1,12 +1,12 @@
 package com.upiicsa.ApiSIP.Service;
 
-import com.upiicsa.ApiSIP.Model.Catalogs.ProcessState;
+import com.upiicsa.ApiSIP.Model.Catalogs.ProcessStatus;
 import com.upiicsa.ApiSIP.Model.Enum.StateProcessEnum;
 import com.upiicsa.ApiSIP.Model.History;
 import com.upiicsa.ApiSIP.Model.Document_Process.StudentProcess;
 import com.upiicsa.ApiSIP.Model.UserSIP;
 import com.upiicsa.ApiSIP.Repository.HistoryRepository;
-import com.upiicsa.ApiSIP.Repository.Catalogs.ProcessStateRepository;
+import com.upiicsa.ApiSIP.Repository.Catalogs.ProcessStatusRepository;
 import com.upiicsa.ApiSIP.Repository.UserRepository;
 import jakarta.persistence.EntityNotFoundException;
 import org.springframework.beans.factory.annotation.Value;
@@ -23,10 +23,10 @@ public class HistoryService {
     private Integer defaultUser;
     private HistoryRepository historyRepository;
     private UserRepository userRepository;
-    private ProcessStateRepository stateRepository;
+    private ProcessStatusRepository stateRepository;
 
     public HistoryService(HistoryRepository historyRepository, UserRepository userRepository,
-                          ProcessStateRepository stateRepository) {
+                          ProcessStatusRepository stateRepository) {
         this.historyRepository = historyRepository;
         this.userRepository = userRepository;
         this.stateRepository = stateRepository;
@@ -39,9 +39,9 @@ public class HistoryService {
 
     @Transactional
     public void saveHistory(StudentProcess process, StateProcessEnum oldState, StateProcessEnum newState) {
-        ProcessState newStateProcess = stateRepository.findByDescription(newState.getName())
+        ProcessStatus newStateProcess = stateRepository.findByDescription(newState.getName())
                 .orElseThrow(()-> new EntityNotFoundException("State not found"));
-        ProcessState oldStateProcess = stateRepository.findByDescription(oldState.getName())
+        ProcessStatus oldStateProcess = stateRepository.findByDescription(oldState.getName())
                 .orElseThrow(()-> new EntityNotFoundException("State not found"));
 
         History newHistory = History.builder()

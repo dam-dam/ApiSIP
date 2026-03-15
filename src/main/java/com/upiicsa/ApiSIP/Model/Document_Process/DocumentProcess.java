@@ -1,7 +1,7 @@
 package com.upiicsa.ApiSIP.Model.Document_Process;
 
 import com.upiicsa.ApiSIP.Model.Catalogs.DocumentType;
-import com.upiicsa.ApiSIP.Model.Catalogs.ProcessState;
+import com.upiicsa.ApiSIP.Model.Catalogs.ProcessStatus;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
@@ -16,20 +16,20 @@ public class DocumentProcess {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @MapsId("idTypeDocument")
-    @JoinColumn(name = "ID_TIPODOC")
+    @JoinColumn(name = "ID_TIPO_DOC")
     private DocumentType documentType;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @MapsId("idStateProcess")
-    @JoinColumn(name = "ID_ESTPROCESO")
-    private ProcessState processState;
+    @JoinColumn(name = "ID_EST_PROCESO")
+    private ProcessStatus processStatus;
 
     @Column(name = "REQUERIDO")
     private Boolean requery;
 
-    public DocumentProcess(DocumentType documentType,  ProcessState processState, Boolean requery) {
+    public DocumentProcess(DocumentType documentType, ProcessStatus processStatus, Boolean requery) {
         this.documentType = documentType;
-        this.processState = processState;
+        this.processStatus = processStatus;
         this.requery = requery;
     }
     public DocumentProcess(){

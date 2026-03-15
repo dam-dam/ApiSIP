@@ -10,11 +10,11 @@ import lombok.Setter;
 @AllArgsConstructor
 @Getter @Setter
 @Entity
-@Table(name = "SIP_CESTADOCUMENTO")
+@Table(name = "SIP_CESTADO_DOC")
 public class DocumentStatus extends BaseCatalog{
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "ID_ESTDOCUMENTO")
+    @Column(name = "ID_ESTADO_DOC")
     private Integer id;
 }
