@@ -159,10 +159,22 @@ function setupActionButtons() {
 
                 //ver que esta madando el script
                 //console.log("Revisando ID:", uniqueId, "Radio encontrado:", !!radio, "Comentario:", commentArea ? commentArea.value : "No existe");
+
+                /* cambiarlo a como me dijo Yael
                 if (radio) {
                     reviews.push({
                         typeCode: doc.typeCode,
                         status: radio.value,
+                        comment: commentArea ? commentArea.value : ""
+                    });
+                }*/
+            if (radio) {
+                reviews.push({
+                        // Cambiamos typeCode por typeName
+                        typeName: doc.typeCode,
+                        // Convertimos el string 'REVISADO_CORRECTO' a true, y cualquier otro a false
+                        approved: radio.value === 'REVISADO_CORRECTO',
+                        // Mantenemos el comentario
                         comment: commentArea ? commentArea.value : ""
                     });
                 }
@@ -220,6 +232,7 @@ function setupActionButtons() {
                 btnFinalize.textContent = "Finalizar Revisión General";
             }
         };
+    
     }
 
     const btnApprove = document.getElementById('btn-approve-acta');
@@ -237,4 +250,5 @@ function setupActionButtons() {
         };
     }
 }
+
 
