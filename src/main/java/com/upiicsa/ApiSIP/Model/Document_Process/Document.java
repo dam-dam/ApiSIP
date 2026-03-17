@@ -23,7 +23,7 @@ public class Document {
     private Integer id;
 
     @Column(name = "FECHA_CARGA", nullable = false)
-    private LocalDateTime UploadDate;
+    private LocalDateTime uploadDate;
 
     @Column(name = "URL", nullable = false  )
     private String URL;

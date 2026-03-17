@@ -25,9 +25,9 @@ public interface OfferRepository extends JpaRepository<Offer, Integer> {
             @Param("syllabusCode") String syllabus
     );
 
-    List<School> findAllSchools();
+    @Query("SELECT DISTINCT o.career FROM Offer o WHERE o.school = :school")
+    List<Career> findBySchool(@Param("school") School school);
 
-    List<Career> findBySchool(School school);
-
-    List<Syllabus> findBySchoolAndCareer(School school, Career career);
+    @Query("SELECT DISTINCT o.syllabus FROM Offer o WHERE o.school = :school AND o.career = :career")
+    List<Syllabus> findBySchoolAndCareer(@Param("school") School school, @Param("career") Career career);
 }

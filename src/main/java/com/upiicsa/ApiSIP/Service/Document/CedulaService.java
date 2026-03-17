@@ -3,6 +3,7 @@ package com.upiicsa.ApiSIP.Service.Document;
 import com.upiicsa.ApiSIP.Dto.Cedula.AddressDto;
 import com.upiicsa.ApiSIP.Dto.Cedula.CedulaDto;
 import com.upiicsa.ApiSIP.Dto.Cedula.CompanyDto;
+import com.upiicsa.ApiSIP.Exception.ResourceNotFoundException;
 import com.upiicsa.ApiSIP.Model.Address;
 import com.upiicsa.ApiSIP.Model.Company;
 import com.upiicsa.ApiSIP.Model.Enum.CoordsEnum;
@@ -16,9 +17,6 @@ import com.upiicsa.ApiSIP.Service.Infrastructure.PdfService;
 import com.upiicsa.ApiSIP.Service.StudentService;
 import jakarta.persistence.EntityNotFoundException;
 import org.springframework.core.io.Resource;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.MediaType;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import java.util.EnumMap;
@@ -160,18 +158,15 @@ public class CedulaService {
         return outputFileName;
     }
 
-    public ResponseEntity<Resource> getPdfResponseEntity(Integer studentId) {
+    public Resource getPdfResponseEntity(Integer studentId) {
         Student student = requestStudent(studentId);
         Resource resource = pdfService.loadCedulaAsResource(student.getEnrollment());
 
         if (resource == null) {
-            return ResponseEntity.notFound().build();
+            throw new ResourceNotFoundException("PDF not found");
         }
 
-        return ResponseEntity.ok()
-                .contentType(MediaType.APPLICATION_PDF)
-                .header(HttpHeaders.CONTENT_DISPOSITION, "inline; filename=\"" + resource.getFilename() + "\"")
-                .body(resource);
+        return resource;
     }
 
     public Student requestStudent(Integer studentId){

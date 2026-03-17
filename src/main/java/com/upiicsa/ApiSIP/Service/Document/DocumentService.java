@@ -6,15 +6,14 @@ import com.upiicsa.ApiSIP.Model.Catalogs.DocumentStatus;
 import com.upiicsa.ApiSIP.Model.Catalogs.DocumentType;
 import com.upiicsa.ApiSIP.Model.Document_Process.Document;
 import com.upiicsa.ApiSIP.Model.Document_Process.DocumentReview;
-import com.upiicsa.ApiSIP.Model.Enum.StateProcessEnum;
 import com.upiicsa.ApiSIP.Model.Document_Process.StudentProcess;
+import com.upiicsa.ApiSIP.Model.Enum.StateProcessEnum;
 import com.upiicsa.ApiSIP.Model.UserSIP;
 import com.upiicsa.ApiSIP.Repository.Document_Process.DocumentRepository;
-import com.upiicsa.ApiSIP.Repository.Document_Process.DocumentReviewRepository;
-import com.upiicsa.ApiSIP.Repository.Document_Process.DocumentStatusRepository;
 import com.upiicsa.ApiSIP.Repository.UserRepository;
 import com.upiicsa.ApiSIP.Service.Infrastructure.FileStorageService;
 import com.upiicsa.ApiSIP.Utils.DocumentNamingUtils;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -25,33 +24,18 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
+@RequiredArgsConstructor
 public class DocumentService {
 
     private DocumentRepository documentRepository;
-    private DocumentReviewRepository reviewRepository;
-    private DocumentStatusRepository documentStatusRepository;
     private UserRepository userRepository;
-    private DocumentTypeService docTypeService;
+    private DocumentUtilsService utilsService;
     private StudentProcessService processService;
     private DocumentNamingUtils documentNaming;
     private FileStorageService fileStorage;
-
-    public DocumentService(DocumentRepository documentRepository, DocumentReviewRepository reviewRepository,
-                           DocumentStatusRepository documentStatusRepository,UserRepository userRepository,
-                           DocumentTypeService typeService, StudentProcessService processService,
-                           DocumentNamingUtils documentNaming, FileStorageService fileStorage) {
-        this.documentRepository = documentRepository;
-        this.reviewRepository = reviewRepository;
-        this.documentStatusRepository = documentStatusRepository;
-        this.userRepository = userRepository;
-        this.docTypeService = typeService;
-        this.processService = processService;
-        this.documentNaming = documentNaming;
-        this.fileStorage = fileStorage;
-    }
-
+    
     public Optional<Document> getDocByProcessAndDocumentType(StudentProcess process, String typeName){
-        DocumentType type = docTypeService.getByDescription(typeName);
+        DocumentType type = utilsService.getTypeByDescription(typeName);
 
         return documentRepository.findByStudentProcessAndDocumentTypeAndCancellationDateIsNull(process,
                 type);
@@ -60,10 +44,9 @@ public class DocumentService {
     @Transactional
     public void saveDoc(MultipartFile file, String typeName, Integer userId) {
         StudentProcess process = processService.getByStudentId(userId);
-        DocumentType type = docTypeService.getByDescription(typeName);
+        DocumentType type = utilsService.getTypeByDescription(typeName);
 
-        Optional<Document> document = documentRepository.findByStudentProcessAndDocumentTypeAndCancellationDateIsNull
-                (process, type);
+        Optional<Document> document = getDocByProcessAndDocumentType(process, typeName);
 
         if(document.isPresent()){
             Document currentDoc = document.get();
@@ -71,9 +54,9 @@ public class DocumentService {
             switch (currentDoc.getDocumentStatus().getDescription()) {
                 case "APROBADO": throw new ValidationException("Este documento ya fue aprobado y no puede modificarse.");
                 case "CANCELADO": cancelledAndCreated(currentDoc, type, file, userId);
-                break;
+                    break;
                 case "PENDIENTE": updateDoc(currentDoc, typeName, file);
-                break;
+                    break;
             }
         } else {
             createNewDocument(userId, type, file);
@@ -86,7 +69,7 @@ public class DocumentService {
     @Transactional(readOnly = true)
     public List<DocumentStatusDto> getDocuments(Integer userId) {
         StudentProcess process = processService.getByStudentId(userId);
-        List<DocumentType> requiredTypes = docTypeService.getRequiredTypes(process);
+        List<DocumentType> requiredTypes = utilsService.getRequiredTypesByProcess(process);
 
         return requiredTypes.stream().map(type -> {
 
@@ -96,7 +79,7 @@ public class DocumentService {
             if (docOpt.isPresent()) {
                 Document doc = docOpt.get();
 
-                DocumentReview review = reviewRepository.findByDocument(doc);
+                DocumentReview review = utilsService.getReviewByDescription(doc);
                 if (review != null) {
                     return new DocumentStatusDto(type.getDescription(),
                             doc.getDocumentStatus().getDescription(),
@@ -107,7 +90,7 @@ public class DocumentService {
                 return new DocumentStatusDto(type.getDescription(), doc.getDocumentStatus().getDescription(),
                         doc.getURL(), "", "", doc.getUploadDate());
             }
-            return new DocumentStatusDto(type.getDescription(), "PENDING", null,
+            return new DocumentStatusDto(type.getDescription(), "PENDIENTE", null,
                     "", "", null);
 
         }).collect(Collectors.toList());
@@ -119,13 +102,12 @@ public class DocumentService {
         StudentProcess process = processService.getByStudentId(userId);
 
         String finalName = documentNaming.generateVersionedName(process, type);
-        DocumentStatus docStatus = documentStatusRepository.findByDescription("PENDIENTE")
-                .orElse(null);
+        DocumentStatus docStatus = utilsService.getStatusByDescription("PENDIENTE");
 
         Document newDocument = Document.builder()
                 .studentProcess(process)
                 .user(user)
-                .UploadDate(LocalDateTime.now())
+                .uploadDate(LocalDateTime.now())
                 .URL(finalName)
                 .documentType(type)
                 .documentStatus(docStatus)

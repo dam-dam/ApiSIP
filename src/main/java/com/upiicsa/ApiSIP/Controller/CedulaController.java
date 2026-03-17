@@ -5,6 +5,8 @@ import com.upiicsa.ApiSIP.Service.Document.CedulaService;
 import com.upiicsa.ApiSIP.Utils.AuthHelper;
 import jakarta.validation.Valid;
 import org.springframework.core.io.Resource;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
@@ -39,7 +41,12 @@ public class CedulaController {
     @PreAuthorize("hasAnyRole('ALUMNO')")
     public ResponseEntity<Resource> viewCedulaPdf(){
         Integer studentId = AuthHelper.getAuthenticatedUserId();
+        Resource resource = cedulaService.getPdfResponseEntity(studentId);
 
-        return cedulaService.getPdfResponseEntity(studentId);
+        return ResponseEntity.ok()
+                .contentType(MediaType.APPLICATION_PDF)
+                .header(HttpHeaders.CONTENT_DISPOSITION, "inline; finlename=\""
+                        + resource.getFilename() + "\"")
+                .body(resource);
     }
 }

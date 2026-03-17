@@ -67,30 +67,27 @@ public class StudentProcessService {
     public List<ProcessProgressDto> getProcessHistory(Integer userId) {
         StudentProcess process = getByStudentId(userId);
         int currentStageId = process.getProcessStatus().getId();
-        List<History> history = historyService.getHistoriesByProcess(process);
-
-        String[] stages = {
-                "Registrado", "Documentación de inicio", "Carta de aceptación",
-                "Finalización de informes", "Documentación de término", "Liberación"
-        };
+        List<History> historyList = historyService.getHistoriesByProcess(process);
 
         List<ProcessProgressDto> progress = new ArrayList<>();
 
-        for (int i = 0; i < stages.length; i++) {
-            int stageId = i + 1;
+        for(StateProcessEnum state : StateProcessEnum.values()) {
+            if(state == StateProcessEnum.CANCELLATION) continue;
+
+            int stageId = state.getId();
+            String stageName = state.getName();
             String date = "-";
 
-            if (stageId == 1 && currentStageId > 1) {
+            if(stageId == 1 && currentStageId == 1) {
                 date = process.getStartDate().toLocalDate().toString();
-            } else if (stageId > 1 && stageId < currentStageId) {
-                date = history.stream()
-                        .filter(h -> h.getProcess().getId().equals(stageId))
+            } else if (stageId > 1 && stageId <= currentStageId) {
+                date = historyList.stream()
+                        .filter(h -> h.getNewState().getId().equals(stageId))
                         .findFirst()
                         .map(h -> h.getUpdateDate().toLocalDate().toString())
                         .orElse("-");
             }
-
-            progress.add(new ProcessProgressDto(stages[i], date, stageId == currentStageId));
+            progress.add(new ProcessProgressDto(stageName, date, stageId == currentStageId));
         }
         return progress;
     }

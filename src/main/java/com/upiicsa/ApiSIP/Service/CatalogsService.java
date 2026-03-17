@@ -41,8 +41,8 @@ public class CatalogsService {
 
     //School
     public List<SchoolDto> getSchools() {
-        return offerRepository.findAllSchools().stream()
-                .map(school -> new SchoolDto(school))
+        return schoolRepository.findAll().stream()
+                .map(s -> new SchoolDto(s))
                 .toList();
     }
     public School getSchool(String schoolAcronym){
