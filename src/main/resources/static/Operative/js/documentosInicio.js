@@ -3,7 +3,7 @@ const enrollment = urlParams.get('enrollment'); // Obtenemos la boleta
 
 // Endpoints ajustados al Controller
 const API_REVIEW_DATA = `/operatives/student-review?enrollment=${enrollment}`;
-// Endpoints de acción
+// Endpoints de acción(POST)
 const API_SAVE_DOC = `/operatives/review-document`;
 const API_FINALIZE = `/operatives/finalize-review`;
 const API_APPROVE_ACTA = `/operatives/approve-acceptance-act`;
