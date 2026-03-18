@@ -118,14 +118,14 @@ function updateCard(id, data) {
     let statusCls = "status-none", badgeCls = "badge-none", label = "Sin Cargar";
 
     // Mapeo de estados del backend
-    if (data.status === "REVISADO_CORRECTO") {
+    if (data.status === "CORRECTO") {
         statusCls = "status-correct"; badgeCls = "badge-correct"; label = "Aceptado";
         input.disabled = true;
         labelBtn.style.opacity = "0.5";
         labelBtn.style.pointerEvents = "none";
-    } else if (data.status === "REVISADO_INCORRECTO") {
+    } else if (data.status === "INCORRECTO") {
         statusCls = "status-incorrect"; badgeCls = "badge-incorrect"; label = "Rechazado";
-    } else if (data.status === "EN_REVISION") {
+    } else if (data.status === "PENDIENTE") {
         statusCls = "status-pending"; badgeCls = "badge-pending"; label = "En Revisión";
     } else if (data.fileName) {
         statusCls = "status-pending"; badgeCls = "badge-pending"; label = "Pendiente";
