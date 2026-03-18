@@ -69,8 +69,9 @@ function renderDocuments(docs) {
     }
 
     container.innerHTML = docs.map((doc, index) => {
-        const isRevisado = doc.status === 'REVISADO_CORRECTO';
-        const isIncorrecto = doc.status === 'REVISADO_INCORRECTO';
+        const isRevisado = doc.status === 'CORRECTO';
+        const isIncorrecto = doc.status === 'INCORRECTO';
+
         // Verificar si hay nombre de archivo real
         const hasFile = doc.fileName && doc.fileName.trim() !== '';
         const isSinDoc = !hasFile || doc.status === 'SIN_CARGAR';
@@ -79,8 +80,8 @@ function renderDocuments(docs) {
         // Ignoramos doc.viewUrl que viene mal del backend y usamos DOC_PATH + fileName
         const fileUrl = hasFile ? `${DOC_PATH}${doc.fileName}` : '';
 
-        const isCargado = (doc.status === 'CARGADO' || doc.status === 'EN_REVISION' || isIncorrecto) && hasFile;
-
+        //antes del cambio de la bd: const isCargado = (doc.status === 'CARGADO' || doc.status === 'EN_REVISION' || isIncorrecto) && hasFile;
+        const isCargado = (doc.status === 'PENDIENTE' || isIncorrecto) && hasFile;
         let cardClass = '';
         if (isSinDoc) cardClass = 'card-sin-doc';
         else if (isRevisado) cardClass = 'card-revisado';

@@ -63,7 +63,8 @@ async function iniciarSesion() {
             showModal('Error', data.message, 'error');
         }
     } catch (e) {
-        showModal('Error', 'No se pudo conectar al servidor', 'error');
+        showModal('Error', 'No se pudo conectar al servidor', 'error' + e);
+        console.log(e)
     } finally {
         btn.disabled = false;
         btn.textContent = "Iniciar Sesión";
