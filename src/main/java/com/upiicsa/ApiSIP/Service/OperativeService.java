@@ -83,9 +83,9 @@ public class OperativeService {
                 semester, student.getOffer().getSyllabus().code, documents);
     }
 
-    public void performReview(ReviewDto reviewDto, Integer userId){
+    public void performReview(String enrollment, ReviewDto reviewDto, Integer userId){
         StudentProcess process = processRepository.findByStudentEnrollmentAndReasonLeavingIsNull(
-                reviewDto.studentEnrollment()).orElse(null);
+                enrollment).orElse(null);
         Document doc = documentService.getDocByProcessAndDocumentType(process, reviewDto.typeName())
                 .orElseThrow(() -> new EntityNotFoundException("Document not found"));
         UserSIP user = userRepository.findById(userId).orElseThrow(() -> new EntityNotFoundException("User not found"));

@@ -48,9 +48,9 @@ public class OperativeController {
 
     @PostMapping("/reviewDocument")
     @PreAuthorize("hasAnyRole('ADMINISTRADOR', 'OPERADOR')")
-    public ResponseEntity<Boolean> reviewedDocument(@RequestBody ReviewDto reviewDto) {
+    public ResponseEntity<Boolean> reviewedDocument(@RequestParam String enrollment, @RequestBody ReviewDto reviewDto) {
         Integer userId = AuthHelper.getAuthenticatedUserId();
-        operativeService.performReview(reviewDto, userId);
+        operativeService.performReview(enrollment, reviewDto, userId);
 
         return ResponseEntity.ok(true);
     }
