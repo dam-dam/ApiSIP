@@ -169,21 +169,18 @@ function setupActionButtons() {
                         comment: commentArea ? commentArea.value : ""
                     });
                 }*/
-            if (radio) {
-                reviews.push({
-                        // Cambiamos typeCode por typeName
+                if (radio) {
+                    reviews.push({
                         typeName: doc.typeCode,
-                        // Convertimos el string 'REVISADO_CORRECTO' a true, y cualquier otro a false
-                        approved: radio.value === 'REVISADO_CORRECTO',
-                        // Mantenemos el comentario
+                        approved: radio.value === 'CORRECTO',
                         comment: commentArea ? commentArea.value : ""
                     });
                 }
             });
 
             //ver que est amandando el json
-            console.log("JSON FINAL QUE VOY A ENVIAR AL SERVIDOR:");
-            console.log(JSON.stringify(reviews, null, 2));
+            //console.log("JSON FINAL QUE VOY A ENVIAR AL SERVIDOR (COLECCIÓN COMPLETA):");
+            //console.log(JSON.stringify(reviews, null, 2));
 
             if (reviews.length === 0) {
                 showModal(
@@ -199,28 +196,30 @@ function setupActionButtons() {
             btnFinalize.textContent = "Guardando...";
 
             try {
-                const res = await fetch(`${API_SAVE_DOC}?enrollment=${enrollment}`, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(reviews)
-                });
+                // enviar uno por uno
+                for (const review of reviews) {
+                    //console.log("Enviando individualmente:", review.typeName);
 
-                if (res.ok) {
-                    showModal(
-                        "Guardado",
-                        "Revisión general guardada correctamente.",
-                        "success"
-                    );
-                    //alert("Revisión guardada correctamente.");
-                    loadStudentReview();
-                } else {
-                    showModal(
-                        "Error",
-                        "Hubo un error al guardar la revisión, favor de actualizar la pagina",
-                        "error"
-                    );
-                    //alert("Hubo un error al guardar la revisión.");
+                    const res = await fetch(`${API_SAVE_DOC}?enrollment=${enrollment}`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(review) // Se envía el objeto individual
+                    });
+
+                    if (!res.ok) {
+                        throw new Error(`Error en el documento: ${review.typeName}`);
+                    }
                 }
+
+                // Si el ciclo termina sin errores, mostramos el éxito
+                showModal(
+                    "Guardado",
+                    "Revisión general guardada correctamente.",
+                    "success"
+                );
+                //alert("Revisión guardada correctamente.");
+                loadStudentReview();
+
             } catch (e) {
                 showModal(
                     "Uppss ...",
@@ -233,7 +232,6 @@ function setupActionButtons() {
                 btnFinalize.textContent = "Finalizar Revisión General";
             }
         };
-    
     }
 
     const btnApprove = document.getElementById('btn-approve-acta');
@@ -251,5 +249,3 @@ function setupActionButtons() {
         };
     }
 }
-
-
