@@ -59,9 +59,9 @@ header {
 }
 
 .contenido {
-    flex: 1;
-    padding: 30px;
-    max-width: 100%;
+
+    padding: 3rem;
+    max-width: 90%;
 }
 
 .titulo-seccion {

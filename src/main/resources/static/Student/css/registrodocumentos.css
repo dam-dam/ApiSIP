@@ -14,7 +14,7 @@
     --error: #b91c1c;
 }
 
-* { box-sizing: border-box; margin: 0; padding: 0; }
+* { box-sizing: border-box; margin: 0; padding: 0;}
 
 body {
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
@@ -27,7 +27,9 @@ body {
 
 /* --- HEADER ESTANDARIZADO --- */
 header {
-    background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+    background: linear-gradient(135deg,
+        var(--primary) 0%,
+        var(--primary-dark) 100%);
     padding: 0.7rem 3rem;
     color: white;
     display: flex;

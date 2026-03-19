@@ -1,10 +1,86 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="es">
 <head>
-    <meta charset="UTF-8">
-    <title>Title</title>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Prácticas Profesionales - Registro Cartas</title>
+    <link rel="stylesheet" href="css/registrodocumentos.css">
+    <link rel="stylesheet" href="css/registroCartas.css">
+    <link rel="stylesheet" href="/Templates/TemplateCSS/AlertModal.css">
+    <link rel="stylesheet" href="/Templates/TemplateCSS/global.css">
+    <script src="/Templates/TemplateJS/AlertModal.js"></script>
 </head>
 <body>
 
-</body>
-</html>
+<header>
+    <div class="header-brand">
+        <div class="logo-box">
+            <img src="../Imagenes/ipn.png" alt="IPN" class="logo-img">
+            <img src="../Imagenes/logo blanco.png" alt="UPIICSA" class="logo-img">
+        </div>
+        <div class="title-box">
+            <h1>Sistema para Practicas Profesionales</h1>
+            <p>Portal Estudiantil</p>
+        </div>
+    </div>
+    <div class="user-actions">
+        <div class="user-pill" onclick="window.location.href='perfil.html'" title="Ver Perfil">
+            <span id="user-pill-name">Cargando...</span>
+            <div class="user-avatar" id="user-pill-initial">?</div>
+        </div>
+        <button class="btn-logout" id="logoutBtn" title="Cerrar Sesión">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path><polyline points="16 17 21 12 16 7"></polyline><line x1="21" y1="12" x2="9" y2="12"></line></svg>
+        </button>
+    </div>
+</header>
+
+<nav class="nav-bar">
+    <a href="home.html" class="back-link">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg>
+        Volver al Inicio
+    </a>
+</nav>
+
+<div class="container">
+    <div class="page-intro">
+        <h2>Registro de Carta de Aceptacion</h2>
+        <p>Por favor, carga tus archivos en formato PDF. Peso no mayor a 1MB.</p>
+    </div>
+    <div class="disposicion-principal">
+        <section class="panel-subida">
+            <div class="tarjeta-documento" id="tarjeta-carta-aceptacion">
+                <div class="cabecera-tarjeta">
+                    <span class="titulo-documento">Carta de Aceptación</span>
+                </div>
+                <div class="cuerpo-tarjeta">
+                    <div class="zona-seleccion">
+                        <input type="file" id="entrada-archivo" accept=".pdf" style="display:none">
+                        <label for="entrada-archivo" class="boton-buscarArchivo">Seleccionar PDF</label>
+                        <p class="nombre-archivo" id="texto-nombre-archivo">No se ha seleccionado archivo</p>
+                    </div>
+                </div>
+            </div>
+            <div class="bloque-acciones">
+                <button class="boton-guardar" id="boton-enviar-carta" disabled>Guardar y Enviar</button>
+            </div>
+        </section>
+
+        <aside class="panel-vista-previa">
+            <div class="encabezado-visor">
+                <span>Vista Previa del Documento</span>
+            </div>
+            <div class="contenido-pdf" id="contenedor-visor-pdf">
+                <div class="texto-informativo">
+                    <p>Aquí aparecerá tu documento una vez que lo selecciones.</p>
+                </div>
+            </div>
+        </aside>
+    </div>
+
+</div>
+
+<footer>
+    <p><strong>Instituto Politécnico Nacional</strong> | UPIICSA | © 2025 Sistema ApiSIP</p>
+</footer>
+
+<script src="js/registroCartas.js"></script>

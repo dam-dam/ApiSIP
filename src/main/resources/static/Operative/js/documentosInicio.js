@@ -75,9 +75,6 @@ function renderDocuments(docs) {
         // Verificar si hay nombre de archivo real
         const hasFile = doc.fileName && doc.fileName.trim() !== '';
         const isSinDoc = !hasFile || doc.status === 'SIN_CARGAR';
-
-        // CORRECCIÓN CLAVE: Construir la URL en el frontend
-        // Ignoramos doc.viewUrl que viene mal del backend y usamos DOC_PATH + fileName
         const fileUrl = hasFile ? `${DOC_PATH}${doc.fileName}` : '';
 
         //antes del cambio de la bd: const isCargado = (doc.status === 'CARGADO' || doc.status === 'EN_REVISION' || isIncorrecto) && hasFile;
