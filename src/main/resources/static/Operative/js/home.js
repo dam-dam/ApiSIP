@@ -107,7 +107,8 @@ window.filterByStat = function(key) {
 
 async function renderTable() {
     const container = document.getElementById('studentTableBody');
-    // Nota: Aquí podrías añadir filtros de paginación o búsqueda específicos si el backend lo soporta
+    const searchInput = document.getElementById('searchInput').value.toLowerCase();
+
     const response = await fetch(`${API_OPERATIVES}/get-allStudents?page=0&size=50`);
     const data = await response.json();
     const students = data.content || [];

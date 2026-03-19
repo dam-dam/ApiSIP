@@ -193,29 +193,24 @@ function setupActionButtons() {
             btnFinalize.textContent = "Guardando...";
 
             try {
-                // enviar uno por uno
-                for (const review of reviews) {
-                    //console.log("Enviando individualmente:", review.typeName);
+                // SE QUITA EL FOR: Ahora se envía la lista 'reviews' completa en una sola petición
+                const res = await fetch(`${API_SAVE_DOC}?enrollment=${enrollment}`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(reviews) // Enviamos el arreglo completo []
+                });
 
-                    const res = await fetch(`${API_SAVE_DOC}?enrollment=${enrollment}`, {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify(review) // Se envía el objeto individual
-                    });
-
-                    if (!res.ok) {
-                        throw new Error(`Error en el documento: ${review.typeName}`);
-                    }
+                if (res.ok) {
+                    showModal(
+                        "Guardado",
+                        "Revisión general guardada correctamente.",
+                        "success"
+                    );
+                    //alert("Revisión guardada correctamente.");
+                    loadStudentReview();
+                } else {
+                    throw new Error("Error en la respuesta del servidor");
                 }
-
-                // Si el ciclo termina sin errores, mostramos el éxito
-                showModal(
-                    "Guardado",
-                    "Revisión general guardada correctamente.",
-                    "success"
-                );
-                //alert("Revisión guardada correctamente.");
-                loadStudentReview();
 
             } catch (e) {
                 showModal(
