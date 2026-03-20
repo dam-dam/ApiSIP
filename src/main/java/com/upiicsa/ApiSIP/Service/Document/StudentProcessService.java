@@ -78,7 +78,7 @@ public class StudentProcessService {
             String stageName = state.getName();
             String date = "-";
 
-            if(stageId == 1 && currentStageId == 1) {
+            if(stageId == 1 && currentStageId > 1) {
                 date = process.getStartDate().toLocalDate().toString();
             } else if (stageId > 1 && stageId <= currentStageId) {
                 date = historyList.stream()

@@ -52,7 +52,7 @@ public class CatalogsService {
 
     //Career
     public List<CareerDto> getCareers(String schoolAcronym) {
-        return offerRepository.findBySchool(getSchool(schoolAcronym)).stream()
+        return offerRepository.findCareersBySchool(getSchool(schoolAcronym)).stream()
                 .map(career -> new CareerDto(career))
                 .toList();
     }
@@ -62,8 +62,13 @@ public class CatalogsService {
                 .orElseThrow(() -> new EntityNotFoundException("Career with acronym" + careerAcronym + " not found"));
     }
     //Syllabus
-    public List<SyllabusDto> getSyllabuses(String schoolAcronym, String careerAcronym) {
-        return offerRepository.findBySchoolAndCareer(getSchool(schoolAcronym), getCareer(careerAcronym))
+    public List<SyllabusDto> getSyllabusesBySchool(String schoolAcronym) {
+        return offerRepository.findSyllabusBySchool(getSchool(schoolAcronym)).stream()
+                .map(syllabus -> new SyllabusDto(syllabus))
+                .toList();
+    }
+    public List<SyllabusDto> getSyllabusesByCareerAndSchool(String schoolAcronym, String careerAcronym) {
+        return offerRepository.findSyllabusesBySchoolAndCareer(getSchool(schoolAcronym), getCareer(careerAcronym))
                 .stream()
                 .map(syllabus -> new SyllabusDto(syllabus))
                 .toList();

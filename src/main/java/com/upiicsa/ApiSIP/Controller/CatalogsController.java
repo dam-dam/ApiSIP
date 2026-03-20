@@ -21,27 +21,33 @@ public class CatalogsController {
     }
 
     @GetMapping("/schools")
-    public ResponseEntity<List<SchoolDto>> getSchools() {
+    public ResponseEntity<List<SchoolDto>> schools() {
         return ResponseEntity.ok(catalogsService.getSchools());
     }
 
     @GetMapping("/careers")
-    public ResponseEntity<List<CareerDto>> getCareers(@RequestParam String SchoolName) {
+    public ResponseEntity<List<CareerDto>> careersBySchool(@RequestParam String SchoolName) {
         return ResponseEntity.ok(catalogsService.getCareers(SchoolName));
     }
 
     @GetMapping("/syllabus")
-    public ResponseEntity<List<SyllabusDto>> getSyllabuses(@RequestParam String schoolAcronym, @RequestParam String careerAcronym) {
-        return ResponseEntity.ok(catalogsService.getSyllabuses(schoolAcronym, careerAcronym));
+    public ResponseEntity<List<SyllabusDto>> syllabusesByCareerAndSchool(@RequestParam String schoolAcronym,
+                                                                         @RequestParam String careerAcronym) {
+        return ResponseEntity.ok(catalogsService.getSyllabusesByCareerAndSchool(schoolAcronym, careerAcronym));
+    }
+
+    @GetMapping("allSyllabus")
+    public ResponseEntity<List<SyllabusDto>> syllabusesBySchool(@RequestParam String schoolAcronym) {
+        return ResponseEntity.ok(catalogsService.getSyllabusesBySchool(schoolAcronym));
     }
 
     @GetMapping("/semesters")
-    public ResponseEntity<List<SemesterDto>> getSemesters() {
+    public ResponseEntity<List<SemesterDto>> semesters() {
         return ResponseEntity.ok(catalogsService.getSemesters());
     }
 
     @GetMapping("/states")
-    public ResponseEntity<List<StateDto>> getStates(){
+    public ResponseEntity<List<StateDto>> states(){
         return ResponseEntity.ok(catalogsService.getStates());
     }
 }
