@@ -98,7 +98,7 @@ function renderDocuments(docs) {
                         <div style="display:flex; gap:0.8rem; align-items:center;">
                             ${isRevisado ? '<span class="locked-badge">Revisado Correcto</span>' : ''}
                             ${isIncorrecto ? '<span class="locked-badge" style="background:var(--error);">Corrección Solicitada</span>' : ''}
-                            
+
                             ${!isSinDoc && fileUrl ?
             `<button class="btn-view" onclick="viewPdf('${fileUrl}', '${doc.typeCode}')">Ver Archivo</button>` :
             '<button class="btn-view" disabled style="opacity:0.5; cursor:not-allowed;">Sin Archivo</button>'
@@ -106,21 +106,20 @@ function renderDocuments(docs) {
                         </div>
                     </div>
 
-                    <!-- Panel de Acciones -->
                     ${isCargado ? `
                     <div class="status-actions">
                         <label class="action-label opt-ok">
-                            <input type="radio" name="st-${uniqueId}" value="REVISADO_CORRECTO" ${doc.status === 'REVISADO_CORRECTO' ? 'checked' : ''}> 
+                            <input type="radio" name="st-${uniqueId}" value="REVISADO_CORRECTO" ${doc.status === 'REVISADO_CORRECTO' ? 'checked' : ''}>
                             Correcto
                         </label>
                         <label class="action-label opt-err">
-                            <input type="radio" name="st-${uniqueId}" value="REVISADO_INCORRECTO" ${doc.status === 'REVISADO_INCORRECTO' ? 'checked' : ''}> 
+                            <input type="radio" name="st-${uniqueId}" value="REVISADO_INCORRECTO" ${doc.status === 'REVISADO_INCORRECTO' ? 'checked' : ''}>
                             Incorrecto
                         </label>
                     </div>
                     <textarea class="comment-area" id="comm-${uniqueId}" placeholder="Observaciones de revisión...">${doc.comment || ''}</textarea>
                     ` : ''}
-                    
+
                     ${isSinDoc ? `<div style="font-size:0.85rem; color:var(--text-muted); font-style:italic;">El alumno aún no ha cargado este documento.</div>` : ''}
                 </div>
             `;
@@ -196,10 +195,11 @@ function setupActionButtons() {
             btnFinalize.textContent = "Guardando...";
 
             try {
+                // SE QUITA EL FOR: Ahora se envía la lista 'reviews' completa en una sola petición
                 const res = await fetch(`${API_SAVE_DOC}?enrollment=${enrollment}`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(reviews)
+                    body: JSON.stringify(reviews) // Enviamos el arreglo completo []
                 });
 
                 if (res.ok) {
@@ -216,7 +216,6 @@ function setupActionButtons() {
                         "Hubo un error al guardar la revisión, favor de actualizar la pagina",
                         "error"
                     );
-                    //alert("Hubo un error al guardar la revisión.");
                 }
             } catch (e) {
                 showModal(
