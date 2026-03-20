@@ -27,18 +27,46 @@ public class OperativeController {
         this.operativeService = operativeService;
     }
 
-    @GetMapping("/get-allStudents")
+    //lo comento dam por si no jalaba el que el puso
+    /*@GetMapping("/get-allStudents")
     @PreAuthorize("hasAnyRole('ADMINISTRADOR', 'OPERADOR')")
     public ResponseEntity<Page<ResponseStudentDto>> getAllStudents(Pageable pageable) {
         Page<ResponseStudentDto> students = studentService.getStudents(pageable);
 
         return ResponseEntity.ok(students);
+    }*/
+    /*
+    @GetMapping("/get-allStudents")
+    @PreAuthorize("hasAnyRole('ADMINISTRADOR', 'OPERADOR')")
+    public ResponseEntity<Page<ResponseStudentDto>> getAllStudents(
+            Pageable pageable,
+            @RequestParam(required = false) String search
+    ) {
+
+        // Ahora llamamos al nuevo método del Service que acepta el 'search'
+        Page<ResponseStudentDto> students = studentService.getAllStudents(search, pageable);
+
+        return ResponseEntity.ok(students);
+    }*/
+    @GetMapping("/get-allStudents")
+    @PreAuthorize("hasAnyRole('ADMINISTRADOR', 'OPERADOR')")
+    public ResponseEntity<Page<ResponseStudentDto>> getAllStudents(
+            Pageable pageable,
+            @RequestParam(required = false) String search,
+            @RequestParam(defaultValue = "all") String career,
+            @RequestParam(defaultValue = "all") String plan) {
+
+        return ResponseEntity.ok(studentService.getAllStudents(search, career, plan, pageable));
     }
 
     @GetMapping("/stats")
     @PreAuthorize("hasAnyRole('ADMINISTRADOR', 'OPERADOR')")
-    public ResponseEntity<DashboardStatsDto> getStats(@RequestParam String careerAcronym) {
-        return ResponseEntity.ok(operativeService.getStats(careerAcronym));
+    public ResponseEntity<DashboardStatsDto> getStats(
+            @RequestParam(defaultValue = "all") String careerAcronym,
+            @RequestParam(defaultValue = "all") String planCode) {// agregado por dam
+
+
+        return ResponseEntity.ok(operativeService.getStats(careerAcronym, planCode));
     }
 
     @GetMapping("/student-review")

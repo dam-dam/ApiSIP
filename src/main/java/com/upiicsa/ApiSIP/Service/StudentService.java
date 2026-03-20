@@ -1,5 +1,6 @@
 package com.upiicsa.ApiSIP.Service;
 
+import com.upiicsa.ApiSIP.Dto.DashboardStatsDto;
 import com.upiicsa.ApiSIP.Dto.Student.ResponseStudentDto;
 import com.upiicsa.ApiSIP.Dto.Student.StudentRegistrationDto;
 import com.upiicsa.ApiSIP.Exception.ValidationException;
@@ -25,6 +26,7 @@ public class StudentService {
     private EmailVerificationService verificationService;
     private CatalogsService catalogsService;
     private StudentProcessService processService;
+
 
     public StudentService (StudentRepository studentRepository, PasswordEncoder passwordEncoder,
                            EmailVerificationService verificationService, CatalogsService catalogsService,
@@ -79,4 +81,39 @@ public class StudentService {
 
         return newStudent;
     }
+
+    // lo hizo daaaam, es para buscar en la bd, aver si jala
+    /*public Page<ResponseStudentDto> getAllStudents(String search, Pageable pageable) {
+        Page<Student> students;
+
+        // LÓGICA: Si el buscador trae texto, filtramos. Si no, traemos todo.
+        if (search != null && !search.trim().isEmpty()) {
+            students = studentRepository.findAllWithSearch(search, pageable);
+        } else {
+            students = studentRepository.findAll(pageable);
+        }
+
+        // Usamos la misma lógica de conversión que ya tienes arriba
+        return students.map(student -> new ResponseStudentDto(
+                student.getName(),
+                student.getFLastName(),
+                student.getMLastName(),
+                student.getEnrollment(),
+                student.getOffer()
+        ));
+    }*/
+
+    public Page<ResponseStudentDto> getAllStudents(String search, String career, String plan, Pageable pageable) {
+        // IMPORTANTE: Que el nombre y los parámetros coincidan con el Controller
+        Page<Student> students = studentRepository.findFiltered(search, career, plan, pageable);
+
+        return students.map(student -> new ResponseStudentDto(
+                student.getName(),
+                student.getFLastName(),
+                student.getMLastName(),
+                student.getEnrollment(),
+                student.getOffer()
+        ));
+    }
+
 }
