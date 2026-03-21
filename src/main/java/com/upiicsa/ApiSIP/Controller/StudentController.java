@@ -1,7 +1,8 @@
 package com.upiicsa.ApiSIP.Controller;
 
-import com.upiicsa.ApiSIP.Dto.ProcessProgressDto;
+import com.upiicsa.ApiSIP.Dto.Data.ProcessProgressDto;
 import com.upiicsa.ApiSIP.Dto.Student.StudentRegistrationDto;
+import com.upiicsa.ApiSIP.Dto.User.DataDto;
 import com.upiicsa.ApiSIP.Model.Student;
 import com.upiicsa.ApiSIP.Service.Document.StudentProcessService;
 import com.upiicsa.ApiSIP.Service.StudentService;
@@ -16,7 +17,7 @@ import java.net.URI;
 import java.util.List;
 
 @RestController
-@RequestMapping("/student")
+@RequestMapping("/students")
 public class StudentController {
 
     private StudentService studentService;
@@ -25,6 +26,14 @@ public class StudentController {
     public StudentController(StudentService studentService, StudentProcessService studentProcessService) {
         this.studentService = studentService;
         this.studentProcessService = studentProcessService;
+    }
+
+    @GetMapping("/data")
+    @PreAuthorize("hasAnyRole('ALUMNO')")
+    public ResponseEntity<DataDto> getStudentData(){
+        Integer studentId = AuthHelper.getAuthenticatedUserId();
+
+        return ResponseEntity.ok(studentService.getDataForStudent(studentId));
     }
 
     @PostMapping("/register")
