@@ -15,6 +15,8 @@ import com.upiicsa.ApiSIP.Service.Document.DocumentService;
 import com.upiicsa.ApiSIP.Service.Document.ReviewDocumentService;
 import jakarta.persistence.EntityNotFoundException;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -40,7 +42,7 @@ public class OperativeService {
         this.reviewService = reviewService;
     }
 
-    public DashboardStatsDto getStats(String careerAcronym){
+    /*public DashboardStatsDto getStats(String careerAcronym){
         List<Student> students;
 
         if(careerAcronym.equals("all")){
@@ -60,6 +62,27 @@ public class OperativeService {
 
         return new DashboardStatsDto(
                 students.size(),
+                counts.getOrDefault("Registrado", 0L).intValue(),
+                counts.getOrDefault("Doc Inicial", 0L).intValue(),
+                counts.getOrDefault("Carta Aceptacion", 0L).intValue(),
+                counts.getOrDefault("Doc Final", 0L).intValue()
+        );
+    }*/
+    public DashboardStatsDto getStats(String careerAcronym, String planCode) {
+        Page<Student> filteredStudents = studentRepository.findFiltered("", careerAcronym, planCode, Pageable.unpaged());
+        List<Student> students = filteredStudents.getContent();
+
+        Map<String, Long> counts = students.stream()
+                .map(student -> processRepository.findByStudentIdAndReasonLeavingIsNull(student.getId()))
+                .filter(Optional::isPresent)
+                .map(Optional::get)
+                .collect(Collectors.groupingBy(
+                        (StudentProcess process) -> process.getProcessStatus().getDescription(),
+                        Collectors.counting()
+                ));
+
+        return new DashboardStatsDto(
+                (int) filteredStudents.getTotalElements(),
                 counts.getOrDefault("Registrado", 0L).intValue(),
                 counts.getOrDefault("Doc Inicial", 0L).intValue(),
                 counts.getOrDefault("Carta Aceptacion", 0L).intValue(),

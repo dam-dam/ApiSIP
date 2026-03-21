@@ -7,6 +7,7 @@
     --text-muted: #6b7280;
     --white: #ffffff;
     --border: #d1d5db;
+    --infoA: #e8dc0a;
 }
 
 * { box-sizing: border-box; margin: 0; padding: 0; }

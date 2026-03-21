@@ -14,9 +14,10 @@ document.addEventListener('DOMContentLoaded', () => {
 async function init() {
     setupListeners();
     await fetchCareers();
+    await fetchSyllabus();
     await updateDashboard();
 }
-
+//cesar sesion================================================
 function setupLogout() {
     document.getElementById('logoutBtn').addEventListener('click', async () => {
         try {
@@ -29,11 +30,12 @@ function setupLogout() {
         }
     });
 }
-
+//buscador solo parte visual, logica mas abajo==============================
 function setupListeners() {
     document.getElementById('searchInput').addEventListener('input', debounce(() => renderTable(), 300));
 }
 
+//parte superior qu emuestra las carreras
 async function fetchCareers() {
     const careers = await apiRequest(`${API_CATALOGS}/careers?SchoolName=UPIICSA`);
     if (!careers) return;
@@ -46,31 +48,40 @@ async function fetchCareers() {
         item.onclick = async () => {
             container.querySelector('.active').classList.remove('active');
             item.classList.add('active');
-            selectedCareer = item.dataset.acronym;
-            selectedPlan = 'all';
-            await fetchSyllabus();
-            await updateDashboard();
+
+            selectedCareer = item.dataset.acronym; // Guardamos la carrera elegida
+            selectedPlan = 'all'; // Siempre reseteamos el plan a 'all' al cambiar de carrera
+
+            await fetchSyllabus(); // Esto cargará los planes de ESA carrera (usando el endpoint de Yael)
+            await renderTable();   // ¡ESTO es lo que actualiza los mil registros con el filtro!
+            await fetchStats();    // Para que los numeritos de arriba también se filtren
         };
     });
 }
 
 async function fetchSyllabus() {
     const container = document.getElementById('planContainer');
+    let url;
+
     if (selectedCareer === 'all') {
-        container.innerHTML = '<div class="selectable-item active" data-code="all">Todos los planes</div>';
-        return;
+        url = `${API_CATALOGS}/allSyllabus?schoolAcronym=UPIICSA`;
+    } else {
+        url = `${API_CATALOGS}/syllabus?schoolAcronym=UPIICSA&careerAcronym=${selectedCareer}`;
     }
 
-    const syllabus = await apiRequest(`${API_CATALOGS}/syllabus?schoolAcronym=UPIICSA&careerAcronym=${selectedCareer}`);
+    const syllabus = await apiRequest(url);
+
     container.innerHTML = '<div class="selectable-item active" data-code="all">Todos los planes</div>' +
-        (syllabus ? syllabus.map(s => `<div class="selectable-item" data-code="${s.code}">${s.code}</div>`).join('') : '');
+    (syllabus ? syllabus.map(s => `<div class="selectable-item" data-code="${s.code}">${s.code}</div>`).join('') : '');
 
     container.querySelectorAll('.selectable-item').forEach(item => {
         item.onclick = async () => {
             container.querySelector('.active').classList.remove('active');
             item.classList.add('active');
             selectedPlan = item.dataset.code;
-            await updateDashboard();
+
+            await renderTable(); // Actualizamos la tabla con el nuevo plan
+            await fetchStats();  // Actualizamos contadores
         };
     });
 }
@@ -81,7 +92,9 @@ async function updateDashboard() {
 }
 
 async function fetchStats() {
-    const stats = await apiRequest(`${API_OPERATIVES}/stats?careerAcronym=${selectedCareer}`);
+    const url = `${API_OPERATIVES}/stats?careerAcronym=${selectedCareer}&planCode=${selectedPlan}`;
+
+    const stats = await apiRequest(url);
     const grid = document.getElementById('statsGrid');
 
     const labels = [
@@ -107,26 +120,35 @@ window.filterByStat = function(key) {
 
 async function renderTable() {
     const container = document.getElementById('studentTableBody');
-    const searchInput = document.getElementById('searchInput').value.toLowerCase();
+    const searchTerm = document.getElementById('searchInput').value.trim();
 
-    const response = await fetch(`${API_OPERATIVES}/get-allStudents?page=0&size=50`);
+
+    let url = `${API_OPERATIVES}/get-allStudents?page=0&size=50&career=${selectedCareer}&plan=${selectedPlan}`;
+
+    if (searchTerm) {
+        url += `&search=${encodeURIComponent(searchTerm)}`;
+    }
+
+    const response = await fetch(url);
     const data = await response.json();
     const students = data.content || [];
 
-    if (students.length === 0) {
-        container.innerHTML = '<tr><td colspan="4" style="text-align:center; padding:3rem; color:var(--text-muted)">No se encontraron alumnos registrados.</td></tr>';
-        return;
-    }
+    try {
 
-    /* CAMBIO CLAVE: Redirección usando s.enrollment (boleta) en lugar de ID */
-    container.innerHTML = students.map(s => `
-            <tr onclick="window.location.href='documentosInicio.html?enrollment=${s.enrollment}'">
+        if (students.length === 0) {
+            container.innerHTML = '<tr><td colspan="4" style="text-align:center; padding:3rem; color:var(--text-muted)">No hay alumnos con estos filtros.</td></tr>';
+            return;
+        }
+
+        container.innerHTML = students.map(s => `
+            <tr onclick="window.location.href='documentosInicio.html?enrollment=${s.enrollment}'" style="cursor:pointer;">
                 <td><strong>${s.offer?.syllabus?.code || 'N/A'}</strong></td>
                 <td>${s.name} ${s.fLastName} ${s.mLastName}</td>
                 <td>${s.enrollment}</td>
                 <td><span class="visual-status" style="background:#e0f2fe; color:#0369a1; padding:4px 10px; border-radius:20px; font-size:0.7rem; font-weight:800;">En Proceso</span></td>
             </tr>
         `).join('');
+    } catch (e) { console.error("Error:", e); }
 }
 
 async function apiRequest(url) {

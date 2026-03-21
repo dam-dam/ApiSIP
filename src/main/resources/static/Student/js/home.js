@@ -39,36 +39,67 @@ async function loadData() {
 
 function renderProgress(apiData) {
     const stepper = document.getElementById('main-stepper');
+    const faseDocInicial = apiData[1] || {};
+    const docsAprobados = faseDocInicial.status === 'ACEPTADO' && faseDocInicial.date !== "-";
 
     stepper.innerHTML = PHASES.map((name, idx) => {
         const data = apiData[idx] || {};
-        const done = data.date && data.date !== "" && data.date !== "-";
-        const current = data.isCurrent || false;
+        let done = data.date && data.date !== "" && data.date !== "-";
+        let current = data.isCurrent || false;
+        let displayDate = data.date;
+
+        // --- LÓGICA DE ESPEJO PARA PASO 3 (CARTAS) ---
+        // Si estamos en el índice 2 (Cartas) y los docs iniciales ya están aceptados:
+        if (idx === 2 && docsAprobados) {
+            done = false;   // Para que se vea verde 'active' y no con palomita todavía
+            current = true; // Forzamos a que brille como fase actual
+            displayDate = faseDocInicial.date; // Le "robamos" la fecha a Doc Inicial
+        }
+
         let statusClass = done && !current ? 'completed' : (current ? 'active' : '');
 
         return `
-                    <div class="step ${statusClass}">
-                        <div class="dot">${(done && !current) ? '✓' : idx + 1}</div>
-                        <div class="step-info">
-                            <span class="label">${name}</span>
-                            <div class="date-container">
-                                <span class="date-badge">${done ? 'Inició: ' + fmt(data.date) : (current ? 'En progreso' : '—')}</span>
-                            </div>
-                        </div>
+            <div class="step ${statusClass}">
+                <div class="dot">${(done && !current) ? '✓' : idx + 1}</div>
+                <div class="step-info">
+                    <span class="label">${name}</span>
+                    <div class="date-container">
+                        <span class="date-badge">
+                            ${done ? 'Terminó: ' + fmt(displayDate) : (current ? 'En progreso' : '—')}
+                        </span>
                     </div>
-                `;
+                </div>
+            </div>
+        `;
     }).join('');
 
-    const docIniciado = apiData[1] && apiData[1].date && apiData[1].date !== "-";
-    if (docIniciado) {
-        document.getElementById('card-seguimiento').classList.remove('locked');
-        const tag = document.getElementById('lock-tag');
-        if (tag) tag.style.display = 'none';
-    } else {
-        document.getElementById('card-seguimiento').onclick = (e) => e.preventDefault();
-    }
-}
+    const cardsParaActivar = ['card-cartas', 'card-seguimiento'];
+    const tagSeguimiento = document.getElementById('lock-tag-seguimiento');
+    const tagCartas = document.getElementById('lock-tag-cartas');
 
+    cardsParaActivar.forEach(id => {
+        const card = document.getElementById(id);
+        if (!card) return;
+
+        if (docsAprobados) {
+            card.classList.remove('locked');
+            card.onclick = null;
+            // Ocultamos candados
+            if (id === 'card-cartas' && tagCartas) tagCartas.style.display = 'none';
+            if (id === 'card-seguimiento' && tagSeguimiento) tagSeguimiento.style.display = 'none';
+        } else {
+            card.classList.add('locked');
+            card.onclick = (e) => {
+                e.preventDefault();
+                showModal(
+                    "Upsss...",
+                    "Primero deben aceptar todos tus Documentos Iniciales.",
+                    "info"
+                );
+            };
+        }
+    });
+}
 function setupLogout() {
     document.getElementById('logoutBtn').addEventListener('click', async () => {
         try {
