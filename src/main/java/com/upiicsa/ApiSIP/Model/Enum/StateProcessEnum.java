@@ -30,7 +30,14 @@ public enum StateProcessEnum {
         for (StateProcessEnum state : values()) {
             if (state.getId() == id) return state;
         }
-        throw new IllegalArgumentException("ID de estado no válido: " + id);
+        throw new IllegalArgumentException("ID for state not valid: " + id);
+    }
+
+    public static StateProcessEnum fromName(String name) {
+        for (StateProcessEnum state : values()) {
+            if (state.getName().equals(name)) return state;
+        }
+        throw new IllegalArgumentException("Name for state not valid: " + name);
     }
 
 }
