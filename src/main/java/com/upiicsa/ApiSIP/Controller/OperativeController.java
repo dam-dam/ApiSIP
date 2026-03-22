@@ -27,27 +27,6 @@ public class OperativeController {
         this.operativeService = operativeService;
     }
 
-    //lo comento dam por si no jalaba el que el puso
-    /*@GetMapping("/get-allStudents")
-    @PreAuthorize("hasAnyRole('ADMINISTRADOR', 'OPERADOR')")
-    public ResponseEntity<Page<ResponseStudentDto>> getAllStudents(Pageable pageable) {
-        Page<ResponseStudentDto> students = studentService.getStudents(pageable);
-
-        return ResponseEntity.ok(students);
-    }*/
-    /*
-    @GetMapping("/get-allStudents")
-    @PreAuthorize("hasAnyRole('ADMINISTRADOR', 'OPERADOR')")
-    public ResponseEntity<Page<ResponseStudentDto>> getAllStudents(
-            Pageable pageable,
-            @RequestParam(required = false) String search
-    ) {
-
-        // Ahora llamamos al nuevo método del Service que acepta el 'search'
-        Page<ResponseStudentDto> students = studentService.getAllStudents(search, pageable);
-
-        return ResponseEntity.ok(students);
-    }*/
     @GetMapping("/get-allStudents")
     @PreAuthorize("hasAnyRole('ADMINISTRADOR', 'OPERADOR')")
     public ResponseEntity<Page<ResponseStudentDto>> getAllStudents(
@@ -63,17 +42,18 @@ public class OperativeController {
     @PreAuthorize("hasAnyRole('ADMINISTRADOR', 'OPERADOR')")
     public ResponseEntity<DashboardStatsDto> getStats(
             @RequestParam(defaultValue = "all") String careerAcronym,
-            @RequestParam(defaultValue = "all") String planCode) {// agregado por dam
-
+            @RequestParam(defaultValue = "all") String planCode) {
 
         return ResponseEntity.ok(operativeService.getStats(careerAcronym, planCode));
     }
 
     @GetMapping("/student-review")
     @PreAuthorize("hasAnyRole('ADMINISTRADOR', 'OPERADOR')")
-    public ResponseEntity<StudentReviewDto> getStudentReview(@RequestParam String enrollment) {
+    public ResponseEntity<StudentReviewDto> getStudentReview(
+            @RequestParam String enrollment,
+            @RequestParam String processStatus) {
 
-        return ResponseEntity.ok(operativeService.getReview(enrollment));
+        return ResponseEntity.ok(operativeService.getReview(enrollment, processStatus));
     }
 
     @PostMapping("/review-document")
