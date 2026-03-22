@@ -1,15 +1,8 @@
 package com.upiicsa.ApiSIP.Service;
 
-import com.upiicsa.ApiSIP.Dto.ProfileDto;
-import com.upiicsa.ApiSIP.Dto.Student.InfoInstitutionalDto;
-import com.upiicsa.ApiSIP.Dto.UserNameDto;
-import com.upiicsa.ApiSIP.Model.Document_Process.StudentProcess;
-import com.upiicsa.ApiSIP.Model.Student;
+import com.upiicsa.ApiSIP.Dto.User.DataDto;
 import com.upiicsa.ApiSIP.Model.UserSIP;
-import com.upiicsa.ApiSIP.Repository.Document_Process.StudentProcessRepository;
-import com.upiicsa.ApiSIP.Repository.StudentRepository;
 import com.upiicsa.ApiSIP.Repository.UserRepository;
-import jakarta.persistence.EntityNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -20,75 +13,30 @@ import java.util.Optional;
 public class UserService {
 
     private UserRepository userRepository;
-    private StudentRepository studentRepository;
-    private StudentProcessRepository processRepository;
     private final PasswordEncoder passwordEncoder;
 
-    public UserService(UserRepository userRepository, StudentRepository studentRepository,
-                        StudentProcessRepository processRepository,  PasswordEncoder passwordEncoder) {
+    public UserService(UserRepository userRepository, PasswordEncoder passwordEncoder) {
         this.userRepository = userRepository;
-        this.studentRepository = studentRepository;
-        this.processRepository = processRepository;
         this.passwordEncoder = passwordEncoder;
     }
 
     @Transactional(readOnly = true)
-    public Optional<UserSIP> getUserByEmail(String email) {
-        return userRepository.findByEmail(email);
+    public Optional<UserSIP> getUserById(Integer id){
+        return userRepository.findById(id);
     }
 
-    @Transactional
-    public void enableUser(UserSIP user) {
-        user.setEnabled(true);
-        userRepository.save(user);
+    @Transactional(readOnly = true)
+    public DataDto getData(Integer id) {
+        UserSIP user =  userRepository.findById(id).orElse(null);
+
+        return new DataDto(user.getName(), user.getFLastName(), user.getMLastName(),
+                user.getEmail(),null);
     }
+
 
     @Transactional
     public void updatePassword(UserSIP user, String password) {
         user.setPassword(passwordEncoder.encode(password));
         userRepository.save(user);
-    }
-
-    @Transactional(readOnly = true)
-    public ProfileDto getProfile(Integer id) {
-        Student student = studentRepository.findById(id).orElse(null);
-        UserSIP user =  userRepository.findById(id).orElse(null);
-
-        ProfileDto profileDto;
-
-        if(student == null) {
-            profileDto = new ProfileDto(user.getName(), user.getFLastName(), user.getMLastName(), user.getEmail(),
-                    null, null);
-        }else{
-            StudentProcess process= processRepository.getById(id);
-            String semester = student.isGraduate()
-                    ? "Pasante"
-                    : student.getSemester().getDescription();
-            InfoInstitutionalDto institutionalDto =  new InfoInstitutionalDto(student.getEnrollment(),
-                    student.getOffer().getCareer().getName(), student.getOffer().getSyllabus().getCode(),
-                    semester, process.getProcessStatus().getDescription());
-
-            profileDto = new ProfileDto(user.getName(), user.getFLastName(), user.getMLastName(), user.getEmail(),
-                    student.getPhone(), institutionalDto);
-        }
-        return profileDto;
-    }
-
-    @Transactional(readOnly = true)
-    public UserNameDto getName(Integer id) {
-        UserSIP user = userRepository.findById(id)
-                .orElseThrow(() -> new EntityNotFoundException("User not found"));
-
-        String name  = user.getName();
-        String splitName;
-        int space =  name.indexOf(" ");
-
-        if(space != -1) {
-            splitName =  name.substring(0, space);
-        }else {
-            splitName = name;
-        }
-
-        return new UserNameDto(splitName, user.getFLastName());
     }
 }
