@@ -1,4 +1,4 @@
-const API_STATUS = '/student/process-status';
+const API_STATUS = '/students/process-status';
 const API_LOGOUT = '/auth/logout';
 const PHASES = ["Registrado", "Doc Inicial", "Cartas", "Doc Término", "Liberación" ];// , "Finalización de informes"
 

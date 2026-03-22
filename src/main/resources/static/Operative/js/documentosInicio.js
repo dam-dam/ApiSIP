@@ -2,7 +2,7 @@ const urlParams = new URLSearchParams(window.location.search);
 const enrollment = urlParams.get('enrollment'); // Obtenemos la boleta
 
 // Endpoints ajustados al Controller
-const API_REVIEW_DATA = `/operatives/student-review?enrollment=${enrollment}`;
+const API_REVIEW_DATA = `/operatives/student-review?enrollment=${enrollment}&processStatus=DOC_INICIAL`;
 // Endpoints de acción(POST)
 const API_SAVE_DOC = `/operatives/review-document`;
 const API_FINALIZE = `/operatives/finalize-review`;
