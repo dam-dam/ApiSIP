@@ -18,13 +18,13 @@ async function loadUserProfile() {
 
             // Actualizar Información de Contacto
             document.getElementById('info-email').textContent = data.email;
-            document.getElementById('info-phone').textContent = data.phone;
+            document.getElementById('info-phone').textContent = data.infoInstitutional.phone;
 
             // Actualizar Información Institucional
-            document.getElementById('info-career').textContent = data.career;
-            document.getElementById('info-plan').textContent = data.syllabus;
-            document.getElementById('info-semester').textContent = data.semester;
-            document.getElementById('info-practice-status').textContent = data.processStatus;
+            document.getElementById('info-career').textContent = data.infoInstitutional.career;
+            document.getElementById('info-plan').textContent = data.infoInstitutional.syllabus;
+            document.getElementById('info-semester').textContent = data.infoInstitutional.semester;
+            document.getElementById('info-practice-status').textContent = data.infoInstitutional.processStatus;
         } else {
             console.error("No se pudo cargar el perfil. Estado HTTP:", resp.status);
         }
@@ -103,43 +103,3 @@ function setupPasswordUpdate() {
         }
     });
 }
-
-// Controlador del Modal
-
-/*
-
-function showModal(title, message, type, callback) {
-    const modal = document.getElementById('custom-modal');
-    const iconBox = document.getElementById('modal-icon-box');
-    const titleEl = document.getElementById('modal-title');
-    const msgEl = document.getElementById('modal-message');
-    const btn = document.getElementById('btn-modal-close');
-
-    titleEl.textContent = title;
-    msgEl.textContent = message;
-
-    // Configurar icono y color según tipo
-    if (type === 'success') {
-        iconBox.className = 'modal-icon-box icon-success';
-        iconBox.innerHTML = `
-                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M4.5 12.75l6 6 9-13.5" />
-                    </svg>`;
-    } else {
-        iconBox.className = 'modal-icon-box icon-error';
-        iconBox.innerHTML = `
-                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3.75m9-.75a9 9 0 11-18 0 9 9 0 0118 0zm-9 3.75h.008v.008H12v-.008z" />
-                    </svg>`;
-    }
-
-    // Mostrar modal
-    modal.classList.add('active');
-
-    // Manejar cierre
-    btn.onclick = () => {
-        modal.classList.remove('active');
-        if (callback) callback();
-    };
-}
-*/

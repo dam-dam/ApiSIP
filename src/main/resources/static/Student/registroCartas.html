@@ -6,9 +6,9 @@
     <title>Prácticas Profesionales - Registro Cartas</title>
     <link rel="stylesheet" href="css/registrodocumentos.css">
     <link rel="stylesheet" href="css/registroCartas.css">
-    <link rel="stylesheet" href="/Templates/TemplateCSS/AlertModal.css">
     <link rel="stylesheet" href="/Templates/TemplateCSS/global.css">
     <script src="/Templates/TemplateJS/AlertModal.js"></script>
+
 </head>
 <body>
 
@@ -41,42 +41,26 @@
     </a>
 </nav>
 
+<div class="page-intro">
+    <h2>Registro de Carta de Aceptación</h2>
+    <p>Por favor, carga tus archivos en formato PDF. Peso no mayor a 1MB.</p>
+</div>
+
 <div class="container">
-    <div class="page-intro">
-        <h2>Registro de Carta de Aceptacion</h2>
-        <p>Por favor, carga tus archivos en formato PDF. Peso no mayor a 1MB.</p>
-    </div>
-    <div class="disposicion-principal">
-        <section class="panel-subida">
-            <div class="tarjeta-documento" id="tarjeta-carta-aceptacion">
-                <div class="cabecera-tarjeta">
-                    <span class="titulo-documento">Carta de Aceptación</span>
-                </div>
-                <div class="cuerpo-tarjeta">
-                    <div class="zona-seleccion">
-                        <input type="file" id="entrada-archivo" accept=".pdf" style="display:none">
-                        <label for="entrada-archivo" class="boton-buscarArchivo">Seleccionar PDF</label>
-                        <p class="nombre-archivo" id="texto-nombre-archivo">No se ha seleccionado archivo</p>
-                    </div>
-                </div>
-            </div>
-            <div class="bloque-acciones">
-                <button class="boton-guardar" id="boton-enviar-carta" disabled>Guardar y Enviar</button>
-            </div>
-        </section>
 
-        <aside class="panel-vista-previa">
-            <div class="encabezado-visor">
-                <span>Vista Previa del Documento</span>
-            </div>
-            <div class="contenido-pdf" id="contenedor-visor-pdf">
-                <div class="texto-informativo">
-                    <p>Aquí aparecerá tu documento una vez que lo selecciones.</p>
-                </div>
-            </div>
-        </aside>
+
+    <div id="contenedor-tarjeta-carta"></div>
+
+    <div class="bloque-acciones">
+        <button class="boton-guardar" id="boton-enviar-carta" disabled>Guardar y Enviar</button>
     </div>
 
+    <div class="vista-previa-seccion">
+        <h3>Vista Previa del Documento</h3>
+        <div id="contenedor-visor-pdf" class="visor-gris">
+            <p>Aquí aparecerá tu documento una vez que lo selecciones.</p>
+        </div>
+    </div>
 </div>
 
 <footer>
@@ -84,3 +68,4 @@
 </footer>
 
 <script src="js/registroCartas.js"></script>
+    <script src="/Templates/TemplateJS/ui-components.js"></script>

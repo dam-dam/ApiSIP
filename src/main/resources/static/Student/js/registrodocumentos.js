@@ -53,45 +53,37 @@ function setupLogout() {
     });
 }
 
-function initUI() {
+function initUI(docsData = []) {
     const container = document.getElementById('docs-container');
-    container.innerHTML = DOC_CONFIG.map(doc => `
-                    <div class="doc-card status-none" id="card-${doc.id}">
-                        <div class="doc-header">
-                            <div style="display: flex; align-items: baseline; gap: 10px;">
-                                <span class="doc-title">${doc.label}</span>
-                                <span id="date-${doc.id}" style="font-size: 0.85rem; color: #6b7280; font-weight: 500;">(--/--/---- --:--)</span>
-                            </div>
-                            <span class="status-badge badge-none" id="badge-${doc.id}">Sin Cargar</span>
-                        </div>
-                        <div class="doc-body">
-                            <div class="upload-area">
-                                <div class="file-controls">
-                                    <input type="file" id="file-${doc.id}" style="display:none" accept=".pdf">
-                                    <label for="file-${doc.id}" class="btn-browse" id="btn-${doc.id}">Seleccionar PDF</label>
-                                    <span class="file-display" id="name-${doc.id}">No se ha seleccionado archivo</span>
-                                </div>
-                            </div>
-                            <div class="comment-area">
-                                <span class="comment-label">Observaciones</span>
-                                <p class="comment-text" id="comment-${doc.id}">Pendiente de carga inicial.</p>
-                            </div>
-                        </div>
-                    </div>
-                `).join('');
 
-    // Listeners para cambios de archivo local
+    container.innerHTML = DOC_CONFIG.map(doc => {
+        const dataDoc = docsData.find(d => d.typeCode === doc.id) || {};
+        const estaAprobado = dataDoc.status === 'CORRECTO';
+
+        // Definimos la acción especial solo para la cédula
+        let accionEspecial = "";
+        if (doc.id === 'cedula' && !estaAprobado) {
+            accionEspecial = `
+                <a href="generarCedula.html" class="btn-generate-inline">
+                    <i class="fas fa-file-signature"></i> Generar Cédula
+                </a>`;
+        }
+
+        return crearTarjetaDocumento(doc, dataDoc, accionEspecial);
+    }).join('');
+
+    // Re-activar los listeners de archivos
     DOC_CONFIG.forEach(doc => {
-        document.getElementById(`file-${doc.id}`).addEventListener('change', (e) => {
-            if (e.target.files.length > 0) {
-                document.getElementById(`name-${doc.id}`).textContent = e.target.files[0].name;
-            }
-        });
+        const input = document.getElementById(`file-${doc.id}`);
+        if(input) {
+            input.addEventListener('change', (e) => {
+                if (e.target.files.length > 0) {
+                    document.getElementById(`name-${doc.id}`).textContent = e.target.files[0].name;
+                }
+            });
+        }
     });
-
-    document.getElementById('btn-global-save').addEventListener('click', handleGlobalUpload);
 }
-
 async function loadStatus() {
     try {
         const resp = await fetch(API_GET_STATUS);
@@ -155,7 +147,13 @@ function updateCard(id, data) {
         if(dateEl) dateEl.textContent = dateStr;
 
         // Actualizar solo el nombre del archivo con su enlace
-        display.innerHTML = `<a href="${DOC_PATH}${data.fileName}" target="_blank" class="file-link">${data.fileName}</a>`;
+       // display.innerHTML = `<a href="${DOC_PATH}${data.fileName}" target="_blank" class="file-link">${data.fileName}</a>`;
+        // Actualizar solo el nombre del archivo con su enlace e icono
+        display.innerHTML = `
+            <a href="${DOC_PATH}${data.fileName}" target="_blank" class="file-link view-document-btn">
+                <i class="fa-solid fa-eye"></i> Ver documento
+            </a>
+        `;
     }
 }
 
@@ -201,40 +199,3 @@ async function handleGlobalUpload() {
         btn.textContent = "Guardar Cambios";
     }
 }
-/*
-
-function showModal(title, message, type, callback) {
-    const modal = document.getElementById('custom-modal');
-    const iconBox = document.getElementById('modal-icon-box');
-    const titleEl = document.getElementById('modal-title');
-    const msgEl = document.getElementById('modal-message');
-    const btn = document.getElementById('btn-modal-close');
-
-    titleEl.textContent = title;
-    msgEl.textContent = message;
-
-    // Configurar icono y color según tipo
-    if (type === 'success') {
-        iconBox.className = 'modal-icon-box icon-success';
-        iconBox.innerHTML = `
-                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M4.5 12.75l6 6 9-13.5" />
-                    </svg>`;
-    } else {
-        iconBox.className = 'modal-icon-box icon-error';
-        iconBox.innerHTML = `
-                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3.75m9-.75a9 9 0 11-18 0 9 9 0 0118 0zm-9 3.75h.008v.008H12v-.008z" />
-                    </svg>`;
-    }
-
-    // Mostrar modal
-    modal.classList.add('active');
-
-    // Manejar cierre
-    btn.onclick = () => {
-        modal.classList.remove('active');
-        if (callback) callback();
-    };
-}
-*/

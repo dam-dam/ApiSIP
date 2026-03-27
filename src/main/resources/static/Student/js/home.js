@@ -33,7 +33,6 @@ async function loadData() {
     let docsData = [];
 
     try {
-        // Usamos credentials: 'include' para que Spring Security nos deje pasar
         const [respStatus, respDocs] = await Promise.all([
             fetch(API_STATUS, { credentials: 'include' }),
             fetch(API_DOCS_STATUS, { credentials: 'include' })
@@ -42,7 +41,7 @@ async function loadData() {
         if (respStatus.ok) stagesData = await respStatus.json();
         if (respDocs.ok) docsData = await respDocs.json();
 
-        console.log("Docs recibidos:", docsData); // Revisa esto en tu consola, amiga
+
     } catch (e) {
         console.warn("Error cargando datos", e);
     }
@@ -57,20 +56,18 @@ function renderProgress(apiData, docsData) {
 
     const docsObligatorios = ["CEDULA_REGISTRO", "CONSTANCIA_IMSS", "CAPTURA_EMPRESA", "CAPTURA_ALUMNO", "HORARIO"];
 
-    // 1. ¿Está TODO en CORRECTO? (Paso a la fase 3)
+    const haSubidoAlgo = docsData && docsData.some(doc => doc.fileName !== null && doc.status !== 'SIN_CARGA');
+
     const todoAprobadoReal = docsObligatorios.every(type => {
         const doc = docsData.find(d => d.typeCode === type);
         return doc && doc.status === 'CORRECTO';
     });
 
-    // 2. ¿Falta subir algo? (Estado SIN_CARGA o no existe el doc)
     const faltaSubirArchivo = docsObligatorios.some(type => {
         const doc = docsData.find(d => d.typeCode === type);
         return !doc || doc.status === 'SIN_CARGA' || !doc.fileName;
     });
 
-    // 3. ¿Ya subió todo pero hay cosas en PENDIENTE?
-    // Si no falta subir nada, pero tampoco está todo aprobado, es que están revisando.
     const estaEnRevision = !faltaSubirArchivo && !todoAprobadoReal;
 
     stepper.innerHTML = PHASES.map((name, idx) => {
@@ -80,28 +77,41 @@ function renderProgress(apiData, docsData) {
         let displayDate = data.date;
         let customStatus = "";
 
-        // --- LÓGICA PARA FASE 2 (Doc Inicial) ---
-        if (idx === 1) {
-            if (todoAprobadoReal) {
-                done = true;      // Palomita verde
+        // --- LÓGICA PARA FASE 0 (Registrado) ---
+        if (idx === 0) {
+            if (haSubidoAlgo) {
+                done = true;
                 current = false;
             } else {
-                done = false;     // Se queda el número 2
-                current = true;   // Círculo verde activo
-
-                if (faltaSubirArchivo) {
-                    customStatus = "Documentación incompleta";
-                } else if (estaEnRevision) {
-                    customStatus = "Revisando..."; // Este es el que querías, amiga
-                }
+                done = false;
+                current = true;
+                // Si la fecha de apiData es nula, usamos la fecha de hoy
+                const fechaValida = (displayDate && displayDate !== "-") ? displayDate : new Date().toISOString();
+                customStatus = `Inició: ${fmt(fechaValida)}`;
             }
         }
 
-        // --- FASE 3 Y 4 ---
-        if ((idx === 2 || idx === 3) && todoAprobadoReal) {
+        // --- LÓGICA PARA FASE 1 (Doc Inicial) ---
+        if (idx === 1) {
+            if (todoAprobadoReal) {
+                done = true;
+                current = false;
+            } else if (haSubidoAlgo) {
+                done = false;
+                current = true;
+                customStatus = faltaSubirArchivo ? "Documentación incompleta" : "Revisando...";
+            } else {
+                done = false;
+                current = false;
+            }
+        }
+
+        // FAse 2 cartas
+        if ((idx === 2) && todoAprobadoReal) {
             done = false;
             current = true;
         }
+
 
         let statusClass = done ? 'completed' : (current ? 'active' : '');
 
@@ -123,12 +133,23 @@ function renderProgress(apiData, docsData) {
 
     actualizarTarjetas(todoAprobadoReal);
 }
-
-// Función auxiliar para no amontonar código
-function actualizarTarjetas(habilitar) {
+//funcion paraa abrir cartar y cartas progreso
+function actualizarTarjetas(docsInicialesOK, cartasOK) {
     const configuracion = [
-        { id: 'card-cartas', link: 'registroCartas.html', tag: 'lock-tag-cartas' },
-        { id: 'card-seguimiento', link: 'registroseguimiento.html', tag: 'lock-tag-seguimiento' }
+        {
+            id: 'card-cartas',
+            link: 'registroCartas.html',
+            tag: 'lock-tag-cartas',
+            puedeAbrir: docsInicialesOK, //solo si docs iniciales estan aprobados
+            mensaje: "Primero deben aceptar todos tus Documentos Iniciales."
+        },
+        {
+            id: 'card-seguimiento',
+            link: 'registroseguimiento.html',
+            tag: 'lock-tag-seguimiento',
+            puedeAbrir: cartasOK, // Solo si las cartas están aprobadas
+            mensaje: "Primero deben Aceptar tus Cartas."
+        }
     ];
 
     configuracion.forEach(item => {
@@ -136,16 +157,21 @@ function actualizarTarjetas(habilitar) {
         const lock = document.getElementById(item.tag);
         if (!card) return;
 
-        if (habilitar) {
+        if (item.puedeAbrir) {
+            // DESBLOQUEADO
             card.classList.remove('locked');
             if (lock) lock.style.display = 'none';
             card.onclick = () => window.location.href = item.link;
             card.style.cursor = "pointer";
+            card.style.opacity = "1";
         } else {
+            // BLOQUEADO
             card.classList.add('locked');
+            if (lock) lock.style.display = 'flex';
+            card.style.cursor = "not-allowed";
             card.onclick = (e) => {
                 e.preventDefault();
-                showModal("Aviso", "Aún faltan documentos por aprobar.", "info");
+                showModal("Aviso", item.mensaje, "info");
             };
         }
     });
