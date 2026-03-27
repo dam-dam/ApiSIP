@@ -19,6 +19,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -45,11 +46,11 @@ public class DocumentService {
     }
 
     @Transactional(readOnly = true)
-    public Optional<Document> getDocByProcessAndDocumentType(StudentProcess process, String typeName){
+    public Optional<Document> getDocByProcessAndType(StudentProcess process, String typeName){
         DocumentType type = utilsService.getTypeByDescription(typeName);
 
-        return documentRepository.findByStudentProcessAndDocumentTypeAndDateIsNull(process,
-                type);
+        return documentRepository.findByStudentProcessAndDocumentTypeAndCancellationDateIsNull
+                (process, type);
     }
 
     @Transactional(readOnly = true)
@@ -62,7 +63,7 @@ public class DocumentService {
         StudentProcess process = processService.getByStudentId(userId);
         DocumentType type = utilsService.getTypeByDescription(typeName);
 
-        Optional<Document> document = getDocByProcessAndDocumentType(process, typeName);
+        Optional<Document> document = getDocByProcessAndType(process, typeName);
 
         if(document.isPresent()){
             Document currentDoc = document.get();
@@ -88,29 +89,44 @@ public class DocumentService {
         StudentProcess process = processService.getByStudentId(userId);
         List<DocumentType> requiredTypes = utilsService.getRequiredTypesStatus(processStatus);
 
+        List<Document> activeDocuments = documentRepository.findActiveDocumentsOrdered(process);
+
+        Map<DocumentType, Document> activeDocsMap = activeDocuments.stream()
+                .collect(Collectors.toMap(
+                        Document::getDocumentType,
+                        doc -> doc,
+                        (doc1, doc2) -> getHighestPriorityDoc(doc1, doc2)
+                ));
+
         return requiredTypes.stream().map(type -> {
+            Document targetDoc = activeDocsMap.get(type);
 
-            Optional<Document> docOpt = documentRepository
-                    .findByStudentProcessAndDocumentTypeAndDateIsNull(process, type);
-
-            if (docOpt.isPresent()) {
-                Document doc = docOpt.get();
-
-                DocumentReview review = utilsService.getReviewByDescription(doc);
-                if (review != null) {
-                    return new DocumentStatusDto(type.getDescription(),
-                            doc.getDocumentStatus().getDescription(),
-                            doc.getURL(), review.getComment(), "/view-document/" + doc.getURL(),
-                            doc.getUploadDate()
-                    );
-                }
-                return new DocumentStatusDto(type.getDescription(), doc.getDocumentStatus().getDescription(),
-                        doc.getURL(), "", "", doc.getUploadDate());
+            if (targetDoc == null) {
+                return new DocumentStatusDto(type.getDescription(), "SIN_CARGA", null, "",
+                        "", null);
             }
-            return new DocumentStatusDto(type.getDescription(), "SIN_CARGA", null,
-                    "", "", null);
 
+            DocumentReview docReview = utilsService.getReviewByDocument(targetDoc);
+            String comment = (docReview != null && docReview.getComment() != null) ? docReview.getComment() : "";
+
+            return new DocumentStatusDto(type.getDescription(), targetDoc.getDocumentStatus().getDescription(),
+                    targetDoc.getURL(), comment, "/view-document/" + targetDoc.getURL(),
+                    targetDoc.getUploadDate()
+            );
         }).collect(Collectors.toList());
+    }
+
+    private Document getHighestPriorityDoc(Document doc1, Document doc2) {
+        String status1 = doc1.getDocumentStatus().getDescription();
+        String status2 = doc2.getDocumentStatus().getDescription();
+
+        if (status1.equals("CORRECTO") || status2.equals("CORRECTO")) {
+            return status1.equals("CORRECTO") ? doc1 : doc2;
+        }
+        if (status1.equals("PENDIENTE") || status2.equals("PENDIENTE")) {
+            return status1.equals("PENDIENTE") ? doc1 : doc2;
+        }
+        return doc1.getUploadDate().isAfter(doc2.getUploadDate()) ? doc1 : doc2;
     }
 
     @Transactional
@@ -136,9 +152,7 @@ public class DocumentService {
 
     @Transactional
     public void changeStatus(DocumentStatus docStatus, Document doc){
-        if(docStatus.getDescription().equals("INCORRECTO")){
-            doc.setCancellationDate(LocalDateTime.now());
-        }
+
         doc.setDocumentStatus(docStatus);
         documentRepository.save(doc);
     }

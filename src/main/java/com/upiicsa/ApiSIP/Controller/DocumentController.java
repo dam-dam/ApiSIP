@@ -22,16 +22,11 @@ public class DocumentController {
 
     @GetMapping("/my-status")
     @PreAuthorize("hasAnyRole('ALUMNO')")
-    public ResponseEntity<List<DocumentStatusDto>> getMyStatus/*(@RequestParam String processStatus) {
-
-        return ResponseEntity.ok(documentService.getDocuments(getUserId(), processStatus));
-    }*/ //lo de abajo es de dam
-    (
-            @RequestParam(required = false, defaultValue = "DOC_INICIAL") String processStatus) {
+    public ResponseEntity<List<DocumentStatusDto>> getMyStatus(@RequestParam String processStatus) {
 
         return ResponseEntity.ok(documentService.getDocuments(getUserId(), processStatus));
     }
-//========================================================================================================
+
     @PostMapping("/upload")
     @PreAuthorize("hasAnyRole('ALUMNO')")
     public ResponseEntity<String> uploadDocument(

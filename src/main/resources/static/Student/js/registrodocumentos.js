@@ -86,14 +86,28 @@ function initUI(docsData = []) {
 }
 async function loadStatus() {
     try {
-        const resp = await fetch(API_GET_STATUS);
-        if (!resp.ok) return;
+        const urlCompleta = API_GET_STATUS + "?processStatus=DOC_INICIAL";
+        const resp = await fetch(urlCompleta);
+
+        if (!resp.ok) {
+            console.error("Error HTTP:", resp.status);
+            return;
+        }
+
+        const isJson = resp.headers.get("content-type")?.includes("application/json");
+        if (!isJson) {
+            console.error("El servidor no devolvió JSON. Probablemente te redirigió al login.");
+            return;
+        }
+
         const data = await resp.json();
+        console.log("¡Por fin llegaron los datos!:", data);
 
         data.forEach(item => {
             const config = DOC_CONFIG.find(c => c.typeCode === item.typeCode);
             if (config) updateCard(config.id, item);
         });
+
     } catch (e) {
         console.error("Error cargando estatus:", e);
     }

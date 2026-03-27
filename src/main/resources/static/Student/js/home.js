@@ -33,15 +33,21 @@ async function loadData() {
     let docsData = [];
 
     try {
+        // No enviabas el processStatus y solo funcionaba por el default del back
+        const urlDocs = `${API_DOCS_STATUS}?processStatus=DOC_INICIAL`;
+        /* Usamos credentials: 'include' para que Spring Security nos deje pasar
+        Credentials sobra porque la autenticacion es por Cookie HttpOnly que se envia
+        en automatico porque el front esta dentro de Spring y con el mismo dominio
+        */
         const [respStatus, respDocs] = await Promise.all([
-            fetch(API_STATUS, { credentials: 'include' }),
-            fetch(API_DOCS_STATUS, { credentials: 'include' })
+            fetch(API_STATUS),
+            fetch(urlDocs)
         ]);
 
         if (respStatus.ok) stagesData = await respStatus.json();
         if (respDocs.ok) docsData = await respDocs.json();
 
-
+        console.log("Docs recibidos:", docsData); // Revisa esto en tu consola, amiga
     } catch (e) {
         console.warn("Error cargando datos", e);
     }
@@ -94,7 +100,7 @@ function renderProgress(apiData, docsData) {
         // --- LÓGICA PARA FASE 1 (Doc Inicial) ---
         if (idx === 1) {
             if (todoAprobadoReal) {
-                done = true;
+                done = true;      // Palomita verde
                 current = false;
             } else if (haSubidoAlgo) {
                 done = false;
@@ -106,8 +112,8 @@ function renderProgress(apiData, docsData) {
             }
         }
 
-        // FAse 2 cartas
-        if ((idx === 2) && todoAprobadoReal) {
+        // --- FASE 3 Y 4 ---
+        if ((idx === 2 || idx === 3) && todoAprobadoReal) {
             done = false;
             current = true;
         }

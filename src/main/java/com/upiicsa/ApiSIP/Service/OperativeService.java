@@ -86,12 +86,11 @@ public class OperativeService {
     public void performReview(String enrollment, List<ReviewDocumentDto> reviewsDto, Integer userId) {
         StudentProcess process = processService.findByEnrollment(enrollment)
                 .orElseThrow(() -> new EntityNotFoundException("Proceso no encontrado"));
-        System.out.println("Process: " + process.getId());
         UserSIP user = userRepository.findById(userId)
                 .orElseThrow(() -> new EntityNotFoundException("Usuario no encontrado"));
 
         for (ReviewDocumentDto dto : reviewsDto) {
-            Document doc = documentService.getDocByProcessAndDocumentType(process, dto.typeName())
+            Document doc = documentService.getDocByProcessAndType(process, dto.typeName())
                     .orElseThrow(() -> new EntityNotFoundException("Documento no encontrado: " + dto.typeName()));
 
             reviewService.save(doc, user, dto.approved(), dto.comment());

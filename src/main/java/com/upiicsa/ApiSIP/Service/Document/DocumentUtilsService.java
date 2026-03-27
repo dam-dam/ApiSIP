@@ -1,5 +1,6 @@
 package com.upiicsa.ApiSIP.Service.Document;
 
+import com.upiicsa.ApiSIP.Dto.Document.DocumentStatusDto;
 import com.upiicsa.ApiSIP.Model.Catalogs.DocumentStatus;
 import com.upiicsa.ApiSIP.Model.Catalogs.DocumentType;
 import com.upiicsa.ApiSIP.Model.Catalogs.ProcessStatus;
@@ -12,6 +13,7 @@ import com.upiicsa.ApiSIP.Repository.Document_Process.DocumentReviewRepository;
 import com.upiicsa.ApiSIP.Repository.Document_Process.DocumentStatusRepository;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -49,7 +51,33 @@ public class DocumentUtilsService {
         return statusRepository.findByDescription(description).orElse(null);
     }
 
-    public DocumentReview getReviewByDescription(Document doc){
+    public List<DocumentStatus> getListOfStatus(List<String> statusList){
+        List<DocumentStatus> docStatusList = new ArrayList<>();
+        for(String status : statusList){
+            docStatusList.add(statusRepository.findByDescription(status).orElse(null));
+        }
+        return docStatusList;
+    }
+
+    public DocumentReview getReviewByDocument(Document doc){
         return reviewRepository.findByDocument(doc);
+    }
+
+    public DocumentStatusDto generateDto(DocumentType type, Document doc, DocumentReview docReview){
+
+        if(docReview == null && doc == null){
+            return new DocumentStatusDto(type.getDescription(), "SIN_CARGA", null,
+                    "", "", null);
+        } else if(docReview == null && doc != null){
+            return new DocumentStatusDto(type.getDescription(), doc.getDocumentStatus().getDescription(),
+                    doc.getURL(), "", "/view-document/" + doc.getURL(),
+                    doc.getUploadDate());
+        } else if(docReview != null && doc != null){
+            return new DocumentStatusDto(type.getDescription(), doc.getDocumentStatus().getDescription(),
+                    doc.getURL(), docReview.getComment(), "/view-document/" + doc.getURL(),
+                    doc.getUploadDate());
+        }else {
+            throw new RuntimeException("Entities Not Found");
+        }
     }
 }
