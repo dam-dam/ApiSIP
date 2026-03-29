@@ -4,9 +4,10 @@ import com.upiicsa.ApiSIP.Dto.Student.InfoInstitutionalDto;
 import com.upiicsa.ApiSIP.Dto.Student.ResponseStudentDto;
 import com.upiicsa.ApiSIP.Dto.Student.StudentRegistrationDto;
 import com.upiicsa.ApiSIP.Dto.User.DataDto;
-import com.upiicsa.ApiSIP.Exception.ValidationException;
+import com.upiicsa.ApiSIP.Exception.BusinessException;
 import com.upiicsa.ApiSIP.Model.Address;
 import com.upiicsa.ApiSIP.Model.Document_Process.StudentProcess;
+import com.upiicsa.ApiSIP.Model.Enum.ErrorCode;
 import com.upiicsa.ApiSIP.Model.Student;
 import com.upiicsa.ApiSIP.Repository.*;
 import com.upiicsa.ApiSIP.Service.Auth.EmailVerificationService;
@@ -18,8 +19,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
-import java.util.Optional;
-
 @Service
 public class StudentService {
 
@@ -29,9 +28,9 @@ public class StudentService {
     private CatalogsService catalogsService;
     private StudentProcessService processService;
 
-    public StudentService (StudentRepository studentRepository, PasswordEncoder passwordEncoder,
-                           EmailVerificationService verificationService, CatalogsService catalogsService,
-                           StudentProcessService processService) {
+    public StudentService(StudentRepository studentRepository, PasswordEncoder passwordEncoder,
+                          EmailVerificationService verificationService, CatalogsService catalogsService,
+                          StudentProcessService processService) {
         this.studentRepository = studentRepository;
         this.passwordEncoder = passwordEncoder;
         this.verificationService = verificationService;
@@ -40,27 +39,31 @@ public class StudentService {
     }
 
     @Transactional(readOnly = true)
-    public Optional<Student> getStudentById(Integer id) {
-        return studentRepository.findById(id);
-    }
-
-    @Transactional(readOnly = true)
-    public Page<ResponseStudentDto> getStudents(Pageable pageable) {
-        Page<Student> studentPage = studentRepository.findAll(pageable);
-
-        return studentPage.map(student -> new ResponseStudentDto(
-                student.getName(), student.getFLastName(), student.getMLastName(),
-                student.getEnrollment(), student.getOffer()
-        ));
+    public Student getStudentById(Integer id) {
+        return studentRepository.findById(id).
+                orElseThrow(() -> new BusinessException(ErrorCode.RESOURCE_NOT_FOUND));
     }
 
     @Transactional(readOnly = true)
     public DataDto getDataForStudent(Integer id) {
-        Student student = studentRepository.findById(id).orElse(null);
+        Student student = getStudentById(id);
         StudentProcess process = processService.getByStudentId(student.getId());
 
         return new DataDto(student.getName(), student.getFLastName(), student.getMLastName(),
-                student.getEmail(),new InfoInstitutionalDto(student, process));
+                student.getEmail(), new InfoInstitutionalDto(student, process));
+    }
+
+    @Transactional(readOnly = true)
+    public Page<ResponseStudentDto> getAllStudents(String search, String career, String plan, Pageable pageable) {
+        Page<Student> students = studentRepository.findFiltered(search, career, plan, pageable);
+
+        return students.map(student -> new ResponseStudentDto(
+                student.getName(),
+                student.getFLastName(),
+                student.getMLastName(),
+                student.getEnrollment(),
+                student.getOffer()
+        ));
     }
 
     @Transactional
@@ -72,7 +75,7 @@ public class StudentService {
     @Transactional
     public Student registerStudent(StudentRegistrationDto registrationDto) {
         if (!registrationDto.password().equals(registrationDto.confirmPassword()))
-            throw new ValidationException("Invalid password");
+            throw new BusinessException(ErrorCode.PASSWORD_MISMATCH);
 
         Student newStudent = Student.builder()
                 .email(registrationDto.email())
@@ -94,17 +97,4 @@ public class StudentService {
 
         return newStudent;
     }
-
-    public Page<ResponseStudentDto> getAllStudents(String search, String career, String plan, Pageable pageable) {
-        Page<Student> students = studentRepository.findFiltered(search, career, plan, pageable);
-
-        return students.map(student -> new ResponseStudentDto(
-                student.getName(),
-                student.getFLastName(),
-                student.getMLastName(),
-                student.getEnrollment(),
-                student.getOffer()
-        ));
-    }
-
 }

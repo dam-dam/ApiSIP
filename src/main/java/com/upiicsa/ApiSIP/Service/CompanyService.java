@@ -1,10 +1,11 @@
 package com.upiicsa.ApiSIP.Service;
 
 import com.upiicsa.ApiSIP.Dto.Cedula.CompanyDto;
+import com.upiicsa.ApiSIP.Exception.BusinessException;
 import com.upiicsa.ApiSIP.Model.Address;
 import com.upiicsa.ApiSIP.Model.Company;
+import com.upiicsa.ApiSIP.Model.Enum.ErrorCode;
 import com.upiicsa.ApiSIP.Repository.CompanyRepository;
-import jakarta.persistence.EntityNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -34,7 +35,7 @@ public class CompanyService {
     @Transactional
     public Company updateCompany(Integer companyId, CompanyDto companyDto, Address address) {
         Company company = companyRepository.findById(companyId)
-                .orElseThrow(() -> new EntityNotFoundException("Company not found"));
+                .orElseThrow(() -> new BusinessException(ErrorCode.RESOURCE_NOT_FOUND, "Recurso: Compañia"));
 
         if(!companyDto.name().equals(company.getName())) {
             company.setName(companyDto.name());

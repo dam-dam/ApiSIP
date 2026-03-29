@@ -1,11 +1,12 @@
 package com.upiicsa.ApiSIP.Service;
 
 import com.upiicsa.ApiSIP.Dto.Cedula.AddressDto;
+import com.upiicsa.ApiSIP.Exception.BusinessException;
 import com.upiicsa.ApiSIP.Model.Address;
 import com.upiicsa.ApiSIP.Model.Catalogs.State;
+import com.upiicsa.ApiSIP.Model.Enum.ErrorCode;
 import com.upiicsa.ApiSIP.Repository.AddressRepository;
 import com.upiicsa.ApiSIP.Repository.Catalogs.StateRepository;
-import jakarta.persistence.EntityNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -20,10 +21,15 @@ public class AddressService {
         this.stateRepository = stateRepository;
     }
 
+    @Transactional(readOnly = true)
+    public State findStateById(Integer id){
+        return stateRepository.findById(id)
+                .orElseThrow(() -> new BusinessException(ErrorCode.RESOURCE_NOT_FOUND, "Recurso: Estado"));
+    }
+
     @Transactional
     public Address createAddress(AddressDto addressDto) {
-        State state = stateRepository.findById(addressDto.stateId())
-                .orElseThrow(() -> new EntityNotFoundException("State not found"));
+        State state = findStateById(addressDto.stateId());
 
         Address newAddress = Address.builder()
                 .street(addressDto.street())
@@ -40,7 +46,7 @@ public class AddressService {
     @Transactional
     public Address updateAddress(Integer addressId, AddressDto addressDto) {
         Address address = addressRepository.findById(addressId)
-                .orElseThrow(() -> new EntityNotFoundException("Address not found"));
+                .orElseThrow(() -> new BusinessException(ErrorCode.RESOURCE_NOT_FOUND, "Recurso: Direccion"));
 
         if(!addressDto.street().equals(address.getStreet())){
             address.setStreet(addressDto.street());
@@ -55,8 +61,7 @@ public class AddressService {
             address.setNeighborhood(addressDto.neighborhood());
         }
         if(!addressDto.stateId().equals(address.getState().getId())){
-            State state = stateRepository.findById(addressDto.stateId())
-                    .orElseThrow(() -> new EntityNotFoundException("State not found"));
+            State state = findStateById(addressDto.stateId());
             address.setState(state);
         }
         return addressRepository.save(address);

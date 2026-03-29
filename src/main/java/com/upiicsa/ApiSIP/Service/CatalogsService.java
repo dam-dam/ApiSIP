@@ -1,16 +1,16 @@
 package com.upiicsa.ApiSIP.Service;
 
 import com.upiicsa.ApiSIP.Dto.Catalogs.*;
-import com.upiicsa.ApiSIP.Exception.ResourceNotFoundException;
+import com.upiicsa.ApiSIP.Exception.BusinessException;
 import com.upiicsa.ApiSIP.Model.Catalogs.Career;
 import com.upiicsa.ApiSIP.Model.Catalogs.School;
 import com.upiicsa.ApiSIP.Model.Catalogs.Semester;
 import com.upiicsa.ApiSIP.Model.Catalogs.Status;
+import com.upiicsa.ApiSIP.Model.Enum.ErrorCode;
 import com.upiicsa.ApiSIP.Model.Offer;
 import com.upiicsa.ApiSIP.Model.UserType;
 import com.upiicsa.ApiSIP.Repository.*;
 import com.upiicsa.ApiSIP.Repository.Catalogs.*;
-import jakarta.persistence.EntityNotFoundException;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -47,7 +47,7 @@ public class CatalogsService {
     }
     public School getSchool(String schoolAcronym){
         return schoolRepository.findSchoolByAcronym(schoolAcronym)
-                .orElseThrow(()-> new EntityNotFoundException("School with acronym " + schoolAcronym + " not found"));
+                .orElseThrow(()-> new BusinessException(ErrorCode.CATALOG_NOT_FOUND, "Escuela"));
     }
 
     //Career
@@ -59,7 +59,7 @@ public class CatalogsService {
 
     public Career getCareer(String careerAcronym) {
         return careerRepository.findCareerByAcronym(careerAcronym)
-                .orElseThrow(() -> new EntityNotFoundException("Career with acronym" + careerAcronym + " not found"));
+                .orElseThrow(() -> new BusinessException(ErrorCode.CATALOG_NOT_FOUND, "Carrera"));
     }
     //Syllabus
     public List<SyllabusDto> getSyllabusesBySchool(String schoolAcronym) {
@@ -76,13 +76,13 @@ public class CatalogsService {
     //Offer
     public Offer getOffer(String schoolAcronym, String careerAcronym, String syllabusCode) {
         return offerRepository.findByCompositeKeys(schoolAcronym, careerAcronym, syllabusCode)
-                .orElseThrow(() -> new ResourceNotFoundException("Offer not found"));
+                .orElseThrow(() -> new BusinessException(ErrorCode.CATALOG_NOT_FOUND, "Oferta Academica"));
     }
     //Semester
     public Semester getSemester(String semester, boolean isGraduate) {
         if(isGraduate) return null;
         return semesterRepository.findByDescription(semester)
-                .orElseThrow(() -> new ResourceNotFoundException("Semester not found"));
+                .orElseThrow(() -> new BusinessException(ErrorCode.CATALOG_NOT_FOUND, "Semestre"));
     }
 
     public List<SemesterDto> getSemesters() {
@@ -93,12 +93,12 @@ public class CatalogsService {
     //UserType
     public UserType getType(String type) {
         return typeRepository.findByDescription(type)
-                .orElseThrow(() -> new ResourceNotFoundException("UserType not found"));
+                .orElseThrow(() -> new BusinessException(ErrorCode.CATALOG_NOT_FOUND));
     }
     //Status
     public Status getStatus(String status) {
         return statusRepository.findByDescription(status)
-                .orElseThrow(() -> new ResourceNotFoundException("Status not found"));
+                .orElseThrow(() -> new BusinessException(ErrorCode.CATALOG_NOT_FOUND));
     }
     //State
     public List<StateDto> getStates() {
