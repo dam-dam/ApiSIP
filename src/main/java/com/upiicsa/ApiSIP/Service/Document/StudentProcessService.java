@@ -1,10 +1,10 @@
 package com.upiicsa.ApiSIP.Service.Document;
 
 import com.upiicsa.ApiSIP.Dto.Data.ProcessProgressDto;
-import com.upiicsa.ApiSIP.Exception.ResourceNotFoundException;
-import com.upiicsa.ApiSIP.Exception.ValidationException;
+import com.upiicsa.ApiSIP.Exception.BusinessException;
 import com.upiicsa.ApiSIP.Model.Catalogs.ProcessStatus;
 import com.upiicsa.ApiSIP.Model.Document_Process.Document;
+import com.upiicsa.ApiSIP.Model.Enum.ErrorCode;
 import com.upiicsa.ApiSIP.Model.Enum.StateProcessEnum;
 import com.upiicsa.ApiSIP.Model.History;
 import com.upiicsa.ApiSIP.Model.Student;
@@ -19,7 +19,6 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 
 @Service
 public class StudentProcessService {
@@ -38,24 +37,31 @@ public class StudentProcessService {
     }
 
     @Transactional(readOnly = true)
-    public Optional<StudentProcess> findByStudentId(Integer studentId) {
-        return processRepository.findByStudentIdAndReasonLeavingIsNull(studentId);
+    public StudentProcess findByStudentId(Integer userId) {
+        return processRepository.findByStudentIdAndReasonLeavingIsNull(userId)
+                .orElseThrow(()->new BusinessException(ErrorCode.PROCESS_NOT_FOUND));
     }
 
     @Transactional(readOnly = true)
-    public Optional<StudentProcess> findByEnrollment(String enrollment) {
-        return processRepository.findByStudentEnrollmentAndReasonLeavingIsNull(enrollment);
+    public StudentProcess findByEnrollment(String enrollment) {
+        return processRepository.findByStudentEnrollmentAndReasonLeavingIsNull(enrollment)
+                .orElseThrow(() -> new BusinessException(ErrorCode.PROCESS_NOT_FOUND));
+    }
+
+    @Transactional
+    public void saveProcess(StudentProcess studentProcess) {
+        processRepository.save(studentProcess);
     }
 
     @Transactional
     public void setFirstState(Student student) {
-        var state = processStatusRepository.findByDescription(StateProcessEnum.REGISTERED.getName())
-                        .orElseThrow(()-> new ResourceNotFoundException("State not found"));
+        ProcessStatus status = processStatusRepository.findByDescription(StateProcessEnum.REGISTERED.getName())
+                        .orElseThrow(()-> new BusinessException(ErrorCode.RESOURCE_NOT_FOUND));
 
         StudentProcess firstProcess = StudentProcess.builder()
                 .startDate(LocalDateTime.now())
                 .student(student)
-                .processStatus(state)
+                .processStatus(status)
                 .reasonLeaving(null)
                 .build();
 
@@ -69,7 +75,7 @@ public class StudentProcessService {
 
         ProcessStatus newStatus = processStatusRepository.findByDescription(
                 StateProcessEnum.fromId(currentState.getNextId()).getName())
-                .orElseThrow(()-> new ResourceNotFoundException("Process status not found"));
+                .orElseThrow(() -> new BusinessException(ErrorCode.RESOURCE_NOT_FOUND));
 
         historyService.saveHistory(process, process.getProcessStatus(), newStatus);
         process.setProcessStatus(newStatus);
@@ -90,13 +96,14 @@ public class StudentProcessService {
             if(countedTrue == docs.size()){
                 updateStatus(process);
             }else {
-                throw new ValidationException("The all documents are not successful");
+                throw new BusinessException(ErrorCode.INTERNAL_ERROR);
             }
         }
     }
 
+    @Transactional(readOnly = true)
     public List<ProcessProgressDto> getProcessHistory(Integer userId) {
-        StudentProcess process = getByStudentId(userId);
+        StudentProcess process = findByStudentId(userId);
         int currentStageId = process.getProcessStatus().getId();
         List<History> historyList = historyService.getHistoriesByProcess(process);
 
@@ -121,10 +128,5 @@ public class StudentProcessService {
             progress.add(new ProcessProgressDto(stageName, date, stageId == currentStageId));
         }
         return progress;
-    }
-
-    public StudentProcess getByStudentId(Integer userId) {
-        return processRepository.findByStudentIdAndReasonLeavingIsNull(userId)
-                .orElseThrow(()->new IllegalArgumentException("Process not found"));
     }
 }

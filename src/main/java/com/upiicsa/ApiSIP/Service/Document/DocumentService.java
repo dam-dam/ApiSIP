@@ -1,13 +1,14 @@
 package com.upiicsa.ApiSIP.Service.Document;
 
 import com.upiicsa.ApiSIP.Dto.Document.DocumentStatusDto;
-import com.upiicsa.ApiSIP.Exception.ValidationException;
+import com.upiicsa.ApiSIP.Exception.BusinessException;
 import com.upiicsa.ApiSIP.Model.Catalogs.DocumentStatus;
 import com.upiicsa.ApiSIP.Model.Catalogs.DocumentType;
 import com.upiicsa.ApiSIP.Model.Catalogs.ProcessStatus;
 import com.upiicsa.ApiSIP.Model.Document_Process.Document;
 import com.upiicsa.ApiSIP.Model.Document_Process.DocumentReview;
 import com.upiicsa.ApiSIP.Model.Document_Process.StudentProcess;
+import com.upiicsa.ApiSIP.Model.Enum.ErrorCode;
 import com.upiicsa.ApiSIP.Model.UserSIP;
 import com.upiicsa.ApiSIP.Repository.Document_Process.DocumentRepository;
 import com.upiicsa.ApiSIP.Repository.UserRepository;
@@ -46,7 +47,7 @@ public class DocumentService {
     }
 
     @Transactional(readOnly = true)
-    public Optional<Document> getDocByProcessAndType(StudentProcess process, String typeName){
+    public Optional<Document> findDocByProcessAndType(StudentProcess process, String typeName){
         DocumentType type = utilsService.getTypeByDescription(typeName);
 
         return documentRepository.findByStudentProcessAndDocumentTypeAndCancellationDateIsNull
@@ -63,18 +64,18 @@ public class DocumentService {
         StudentProcess process = processService.getByStudentId(userId);
         DocumentType type = utilsService.getTypeByDescription(typeName);
 
-        Optional<Document> document = getDocByProcessAndType(process, typeName);
+        Optional<Document> document = findDocByProcessAndType(process, typeName);
 
         if(document.isPresent()){
             Document currentDoc = document.get();
 
             switch (currentDoc.getDocumentStatus().getDescription()) {
-                case "CORRECTO": throw new ValidationException("Este documento ya fue aprobado y no puede modificarse.");
+                case "CORRECTO": throw new BusinessException(ErrorCode.DOCUMENT_ALREADY_APPROVED);
                 case "INCORRECTO": cancelledAndCreated(currentDoc, type, file, userId);
                     break;
                 case "PENDIENTE": updateDoc(currentDoc, typeName, file);
                     break;
-                default: throw new ValidationException("Estado de documento invalido.");
+                default: throw new BusinessException(ErrorCode.INTERNAL_ERROR);
             }
         } else {
             createNewDocument(userId, type, file);
@@ -160,7 +161,7 @@ public class DocumentService {
     @Transactional
     public void updateDoc(Document currentDoc, String typeName, MultipartFile file) {
         if(!currentDoc.getDocumentType().getDescription().equals(typeName)){
-            throw new ValidationException("Type for document not coincided.");
+            throw new BusinessException(ErrorCode.INTERNAL_ERROR);
         }
         currentDoc.setUploadDate(LocalDateTime.now());
         documentRepository.save(currentDoc);

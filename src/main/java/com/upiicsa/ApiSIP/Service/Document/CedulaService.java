@@ -3,19 +3,18 @@ package com.upiicsa.ApiSIP.Service.Document;
 import com.upiicsa.ApiSIP.Dto.Cedula.AddressDto;
 import com.upiicsa.ApiSIP.Dto.Cedula.CedulaDto;
 import com.upiicsa.ApiSIP.Dto.Cedula.CompanyDto;
-import com.upiicsa.ApiSIP.Exception.ResourceNotFoundException;
+import com.upiicsa.ApiSIP.Exception.BusinessException;
 import com.upiicsa.ApiSIP.Model.Address;
 import com.upiicsa.ApiSIP.Model.Company;
 import com.upiicsa.ApiSIP.Model.Enum.CoordsEnum;
+import com.upiicsa.ApiSIP.Model.Enum.ErrorCode;
 import com.upiicsa.ApiSIP.Model.Student;
 import com.upiicsa.ApiSIP.Model.Document_Process.StudentProcess;
 import com.upiicsa.ApiSIP.Repository.*;
-import com.upiicsa.ApiSIP.Repository.Document_Process.StudentProcessRepository;
 import com.upiicsa.ApiSIP.Service.AddressService;
 import com.upiicsa.ApiSIP.Service.CompanyService;
 import com.upiicsa.ApiSIP.Service.Infrastructure.PdfService;
 import com.upiicsa.ApiSIP.Service.StudentService;
-import jakarta.persistence.EntityNotFoundException;
 import org.springframework.core.io.Resource;
 import org.springframework.stereotype.Service;
 
@@ -27,15 +26,15 @@ import java.util.Set;
 public class CedulaService {
 
     private StudentService studentService;
-    private StudentProcessRepository processRepository;
+    private StudentProcessService processService;
     private AddressService addressService;
     private CompanyService companyService;
     private PdfService pdfService;
 
-    public CedulaService(StudentService studentService, StudentProcessRepository pRepository,
+    public CedulaService(StudentService studentService, StudentProcessService processService,
                          AddressService addressService, CompanyService companyService, PdfService pdfService) {
         this.studentService = studentService;
-        this.processRepository = pRepository;
+        this.processService = processService;
         this.addressService = addressService;
         this.companyService = companyService;
         this.pdfService = pdfService;
@@ -52,8 +51,7 @@ public class CedulaService {
             studentAddress = new AddressDto(student.getAddress());
         }
 
-        StudentProcess studentProcess = processRepository.findByStudentIdAndReasonLeavingIsNull(student.getId())
-                .orElseThrow(() -> new EntityNotFoundException("StudentProcess not found"));
+        StudentProcess studentProcess = processService.findByStudentId(student.getId());
 
         if(studentProcess.getCompany()!=null){
             company = new CompanyDto(studentProcess.getCompany());
@@ -74,8 +72,7 @@ public class CedulaService {
             studentAddress = addressService.updateAddress(student.getAddress().getId(), cedulaDto.studentAddress());
         }
 
-        StudentProcess studentProcess = processRepository.findByStudentIdAndReasonLeavingIsNull(student.getId())
-                .orElseThrow(() -> new EntityNotFoundException("StudentProcess not found"));
+        StudentProcess studentProcess = processService.findByStudentId(student.getId());
 
         Company company;
         Address companyAddress;
@@ -83,7 +80,7 @@ public class CedulaService {
             companyAddress = addressService.createAddress(cedulaDto.companyAddress());
             company = companyService.createCompany(cedulaDto.companyInfo(), companyAddress);
             studentProcess.setCompany(company);
-            processRepository.save(studentProcess);
+            processService.saveProcess(studentProcess);
         } else {
             company = studentProcess.getCompany();
             companyAddress = addressService.updateAddress(company.getAddress().getId(), cedulaDto.companyAddress());
@@ -163,14 +160,12 @@ public class CedulaService {
         Resource resource = pdfService.loadCedulaAsResource(student.getEnrollment());
 
         if (resource == null) {
-            throw new ResourceNotFoundException("PDF not found");
+            throw new BusinessException(ErrorCode.RESOURCE_NOT_FOUND);
         }
-
         return resource;
     }
 
     public Student requestStudent(Integer studentId){
-        return studentService.getStudentById(studentId)
-                .orElseThrow(() -> new EntityNotFoundException("Student not found"));
+        return studentService.getStudentById(studentId);
     }
 }
