@@ -5,7 +5,9 @@ import com.itextpdf.text.pdf.BaseFont;
 import com.itextpdf.text.pdf.PdfContentByte;
 import com.itextpdf.text.pdf.PdfReader;
 import com.itextpdf.text.pdf.PdfStamper;
+import com.upiicsa.ApiSIP.Exception.BusinessException;
 import com.upiicsa.ApiSIP.Model.Enum.CoordsEnum;
+import com.upiicsa.ApiSIP.Model.Enum.ErrorCode;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.UrlResource;
@@ -51,7 +53,7 @@ public class PdfService {
             pdfReader.close();
             System.out.println("Text included and saved");
         } catch (IOException | com.itextpdf.text.DocumentException e){
-            e.printStackTrace();
+            throw new BusinessException(ErrorCode.PDF_GENERATION_ERROR);
         }
     }
 
@@ -72,8 +74,7 @@ public class PdfService {
                 return null;
             }
         } catch (MalformedURLException ex) {
-            ex.printStackTrace();
-            return null;
+            throw new BusinessException(ErrorCode.FILE_STORAGE_ERROR);
         }
     }
 }

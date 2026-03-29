@@ -1,5 +1,7 @@
 package com.upiicsa.ApiSIP.Service.Infrastructure;
 
+import com.upiicsa.ApiSIP.Exception.BusinessException;
+import com.upiicsa.ApiSIP.Model.Enum.ErrorCode;
 import jakarta.annotation.PostConstruct;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -25,7 +27,7 @@ public class FileStorageService {
         try {
             Files.createDirectories(root);
         } catch (IOException e) {
-            throw new RuntimeException("No se pudo inicializar el directorio de almacenamiento en " + root);
+            throw new BusinessException(ErrorCode.FILE_STORAGE_ERROR);
         }
     }
 
@@ -33,7 +35,7 @@ public class FileStorageService {
         try {
             Files.copy(file.getInputStream(), this.root.resolve(fileName), StandardCopyOption.REPLACE_EXISTING);
         } catch (IOException e) {
-            throw new RuntimeException("Error al guardar archivo físico: " + fileName, e);
+            throw new BusinessException(ErrorCode.FILE_STORAGE_ERROR);
         }
     }
 }

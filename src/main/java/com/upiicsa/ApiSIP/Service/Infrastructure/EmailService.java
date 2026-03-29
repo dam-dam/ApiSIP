@@ -1,5 +1,7 @@
 package com.upiicsa.ApiSIP.Service.Infrastructure;
 
+import com.upiicsa.ApiSIP.Exception.BusinessException;
+import com.upiicsa.ApiSIP.Model.Enum.ErrorCode;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
@@ -36,7 +38,7 @@ public class EmailService {
         try {
             mailSender.send(message);
         } catch (Exception e) {
-            System.err.println("Error al enviar el correo de restablecimiento a " + toEmail + ": " + e.getMessage());
+            throw new BusinessException(ErrorCode.EMAIL_SEND_FAILED);
         }
     }
 
@@ -59,7 +61,7 @@ public class EmailService {
         try {
             mailSender.send(message);
         } catch (Exception e) {
-            System.err.println("Error al enviar el correo de confirmación a " + toEmail + ": " + e.getMessage());
+            throw new BusinessException(ErrorCode.EMAIL_SEND_FAILED);
         }
     }
 }
