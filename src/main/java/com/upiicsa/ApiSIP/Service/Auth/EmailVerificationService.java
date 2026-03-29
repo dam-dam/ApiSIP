@@ -1,8 +1,8 @@
 package com.upiicsa.ApiSIP.Service.Auth;
 
 import com.upiicsa.ApiSIP.Dto.Email.EmailConfirmDto;
-import com.upiicsa.ApiSIP.Exception.ResourceNotFoundException;
-import com.upiicsa.ApiSIP.Exception.ValidationException;
+import com.upiicsa.ApiSIP.Exception.BusinessException;
+import com.upiicsa.ApiSIP.Model.Enum.ErrorCode;
 import com.upiicsa.ApiSIP.Model.Token_Restore.ConfirmationCode;
 import com.upiicsa.ApiSIP.Model.UserSIP;
 import com.upiicsa.ApiSIP.Repository.Token_Restore.ConfirmationCodeRepository;
@@ -46,19 +46,19 @@ public class EmailVerificationService {
     @Transactional
     public void confirmEmail(EmailConfirmDto emailConfirmation) {
         var token = confirmationCodeRepository.findByCode(emailConfirmation.code())
-                .orElseThrow(() -> new IllegalArgumentException("Código de confirmación inválido."));
+                .orElseThrow(() -> new BusinessException(ErrorCode.INVALID_CONFIRMATION_CODE));
 
         UserSIP user = token.getUser();
 
         if (user.getEmail().equals(emailConfirmation.email())) {
             if (token.getExpirationDate().isBefore(LocalDateTime.now())) {
-                throw new IllegalArgumentException("El código de confirmación ha expirado. Por favor, solicite uno nuevo.");
+                throw new BusinessException(ErrorCode.TOKEN_EXPIRED);
             }
             if (user.isEnabled()) {
                 return;
             }
         } else {
-            throw new IllegalArgumentException("El codigo no corresponde al email del usuario");
+            throw new BusinessException(ErrorCode.INVALID_CONFIRMATION_CODE);
         }
 
         user.setEnabled(true);
@@ -71,12 +71,12 @@ public class EmailVerificationService {
     @Transactional
     public void resendConfirmationCode(String email) {
         UserSIP user = userRepository.findByEmail(email)
-                .orElseThrow(() -> new ResourceNotFoundException("Usuario no encontrado con el correo: " + email));
+                .orElseThrow(() -> new BusinessException(ErrorCode.RESOURCE_NOT_FOUND,
+                        " Recurso: Usuario con email " + email));
 
         if (user.getEnabled()) {
-            throw new ValidationException("Este usuario ya ha sido verificado anteriormente.");
+            throw new BusinessException(ErrorCode.USER_ALREADY_VERIFIED);
         }
-
         createAndSendConfirmationCode(user);
     }
 }
