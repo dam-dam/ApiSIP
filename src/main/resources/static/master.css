@@ -1,0 +1,6 @@
+@import url('/Templates/TemplateCSS/global.css');
+@import url("/Templates/TemplateCSS/Header.css");
+@import url("/Templates/TemplateCSS/Footer.css");
+@import url('/Templates/TemplateCSS/TituloFijo.css');
+@import url("/Templates/TemplateCSS/Tarjeta.css");
+@import url("/Templates/TemplateCSS/AlertModal.css");

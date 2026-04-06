@@ -1,0 +1,27 @@
+.doc-body-flex {
+    display: flex;
+    align-items: stretch;
+    justify-content: space-between;
+    gap: 20px;
+    padding: 15px 0;
+    margin:1rem;
+}
+
+.column-item {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    min-width: 0;
+}
+
+/* El ojito y el texto de ver documento */
+.view-document-btn {
+    margin-top: 8px;
+    color: #2e7d32;
+    text-decoration: none;
+    font-size: 0.9rem;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+}

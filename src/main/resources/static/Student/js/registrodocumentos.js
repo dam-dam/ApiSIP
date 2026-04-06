@@ -12,46 +12,15 @@ const DOC_CONFIG = [
 ];
 
 document.addEventListener('DOMContentLoaded', () => {
-    loadUserProfile();
-    setupLogout();
+    renderUniversalHeader('students');
+    tituloFijo(
+        "Documentación Inicial",
+        "Por favor, carga tus archivos en formato PDF. Peso no mayor a 1MB."
+    );
     initUI();
     loadStatus();
+    renderUniversalFooter();
 });
-
-async function loadUserProfile() {
-    try {
-        const resp = await fetch('/students/data');
-        if (resp.ok) {
-            const data = await resp.json();
-            const firstName = data.name.split(' ')[0];
-            const lastName = data.fLastName.split(' ')[0];
-
-            const nameEl = document.getElementById('user-pill-name');
-            const initialEl = document.getElementById('user-pill-initial');
-
-            if(nameEl) nameEl.textContent = `${firstName} ${lastName}`;
-            if(initialEl) initialEl.textContent = firstName.charAt(0).toUpperCase();
-        }
-    } catch (error) {
-        console.error("Error al cargar perfil:", error);
-    }
-}
-
-function setupLogout() {
-    const btnLogout = document.getElementById('logoutBtn');
-    if (!btnLogout) return;
-
-    btnLogout.addEventListener('click', async () => {
-        try {
-            const response = await fetch('/auth/logout', { method: 'POST' });
-            if (response.ok) {
-                window.location.href = '/index.html';
-            }
-        } catch (error) {
-            console.error("Error al intentar cerrar sesión:", error);
-        }
-    });
-}
 
 function initUI(docsData = []) {
     const container = document.getElementById('docs-container');

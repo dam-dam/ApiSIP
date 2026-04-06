@@ -4,41 +4,16 @@ const API_DOCS_STATUS = '/documents/my-status';//get
 const PHASES = ["Registrado", "Doc Inicial", "Cartas", "Doc Término", "Liberación" ];// solo para vista
 
 document.addEventListener('DOMContentLoaded', () => {
-    loadUserProfile();
+    renderUniversalHeader('students');
     loadData();
-    setupLogout();
+    renderUniversalFooter();
 });
-
-async function loadUserProfile() {
-    try {
-        const resp = await fetch('/students/data');
-        if (resp.ok) {
-            const data = await resp.json();
-            const firstName = data.name.split(' ')[0];
-            const lastName = data.fLastName.split(' ')[0];
-
-            const nameEl = document.getElementById('user-pill-name');
-            const initialEl = document.getElementById('user-pill-initial');
-
-            if(nameEl) nameEl.textContent = `${firstName} ${lastName}`;
-            if(initialEl) initialEl.textContent = firstName.charAt(0).toUpperCase();
-        }
-    } catch (error) {
-        console.error("Error al cargar perfil:", error);
-    }
-}
-
 async function loadData() {
     let stagesData = [];
     let docsData = [];
 
     try {
-        // No enviabas el processStatus y solo funcionaba por el default del back
         const urlDocs = `${API_DOCS_STATUS}?processStatus=DOC_INICIAL`;
-        /* Usamos credentials: 'include' para que Spring Security nos deje pasar
-        Credentials sobra porque la autenticacion es por Cookie HttpOnly que se envia
-        en automatico porque el front esta dentro de Spring y con el mismo dominio
-        */
         const [respStatus, respDocs] = await Promise.all([
             fetch(API_STATUS),
             fetch(urlDocs)
@@ -52,7 +27,6 @@ async function loadData() {
         console.warn("Error cargando datos", e);
     }
 
-    // MANDAMOS AMBOS
     renderProgress(stagesData, docsData);
 }
 
@@ -179,18 +153,6 @@ function actualizarTarjetas(docsInicialesOK, cartasOK) {
                 e.preventDefault();
                 showModal("Aviso", item.mensaje, "info");
             };
-        }
-    });
-}
-function setupLogout() {
-    document.getElementById('logoutBtn').addEventListener('click', async () => {
-        try {
-            const response = await fetch(API_LOGOUT, { method: 'POST' });
-            if (response.ok) {
-                window.location.href = '/index.html';
-            }
-        } catch (error) {
-            console.error("Error al cerrar sesión:", error);
         }
     });
 }
