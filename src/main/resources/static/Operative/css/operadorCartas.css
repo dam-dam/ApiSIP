@@ -104,52 +104,6 @@ body {
     min-height: 100vh;
 }
 
-/* --- HEADER ESTANDARIZADO --- */
-header {
-    background: linear-gradient(135deg,
-    var(--primary) 0%,
-    var(--primary-dark) 100%);
-    padding: 0.7rem 3rem;
-    color: white;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    position: sticky;
-    top: 0;
-    z-index: 1000;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.2);
-    border-bottom-left-radius: 15px;
-    border-bottom-right-radius: 15px;
-}
-
-.header-brand { display: flex; align-items: center; gap: 1.5rem; }
-.logo-box {
-    display: flex; align-items: center; gap: 0.75rem;
-    background: rgba(255, 255, 255, 0.15); padding: 0.4rem 0.8rem;
-    border-radius: 10px; backdrop-filter: blur(10px);
-}
-.logo-img { height: 40px; filter: brightness(0) invert(1); }
-.title-box h1 { font-size: 1.25rem; font-weight: 800; margin: 0; }
-.title-box p { font-size: 0.7rem; opacity: 0.9; margin: 0; }
-
-/* NUEVOS ESTILOS DEL HEADER (PÍLDORA Y LOGOUT) */
-.user-actions { display: flex; align-items: center; gap: 0.8rem; }
-.user-pill {
-    display: flex; align-items: center; gap: 0.75rem; background: var(--white);
-    padding: 0.4rem 1rem; border-radius: 50px; color: var(--primary-dark);
-    cursor: pointer; box-shadow: 0 4px 6px rgba(0,0,0,0.1); transition: transform 0.2s;
-}
-.user-pill:hover { transform: scale(1.03); }
-.user-pill span { font-weight: 700; font-size: 0.9rem; }
-.user-avatar { width: 30px; height: 30px; background: var(--primary); color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold; }
-
-.btn-logout {
-    background: rgba(255, 255, 255, 0.2); border: 1px solid rgba(255, 255, 255, 0.4);
-    color: white; width: 40px; height: 40px; border-radius: 50%; cursor: pointer;
-    display: flex; align-items: center; justify-content: center; transition: 0.2s;
-}
-.btn-logout:hover { background: #b91c1c; border-color: #b91c1c; transform: scale(1.1); }
-
 /* --- NAVEGACIÓN STICKY --- */
 .nav-bar {
     background: var(--white);
@@ -287,14 +241,6 @@ header {
 
 .file-link { color: var(--primary); text-decoration: underline; font-weight: 700; }
 
-/* Zona de Comentarios */
-/*.comment-area {*/
-/*    background: #f9fafb;*/
-/*    padding: 1.2rem;*/
-/*    border-radius: 1rem;*/
-/*    border: 1px solid var(--border);*/
-/*    position: relative;*/
-/*}*/
 .comment-label { font-size: 0.65rem; font-weight: 800; color: var(--text-muted); text-transform: uppercase; margin-bottom: 0.6rem; display: block; }
 .comment-text { font-size: 0.85rem; line-height: 1.6; color: #4b5563; }
 .comment-section {
@@ -327,20 +273,6 @@ header {
 .btn-submit:hover { transform: translateY(-3px); box-shadow: 0 8px 20px rgba(26, 140, 20, 0.4); }
 .btn-submit:disabled { background: #d1d5db; box-shadow: none; cursor: not-allowed; transform: none; }
 
-/* --- FOOTER CENTRADO --- */
-footer {
-    background-color: var(--primary-dark);
-    color: white;
-    padding: 1.2rem;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    text-align: center;
-    font-size: 0.75rem;
-    border-top: 2px solid rgba(255,255,255,0.1);
-}
-footer p { margin: 2px 0; opacity: 0.9; font-weight: 500; }
 
 @media (max-width: 850px) {
     .doc-body { grid-template-columns: 1fr; gap: 1.5rem; }

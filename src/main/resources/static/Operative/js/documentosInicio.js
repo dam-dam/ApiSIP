@@ -8,6 +8,7 @@ const API_SAVE_DOC = `/documents/review`;
 //console.log("desde documentosInicio");
 // RUTA BASE PARA VER DOCUMENTOS (IMPORTANTE: Esto corrige el error del backend)
 // El backend tiene configurado /view-documents/**, así que debemos usar esa base
+
 const DOC_PATH = '/view-documents/';
 
 // Variable global para mantener el estado actual de los documentos cargados
@@ -19,8 +20,11 @@ document.addEventListener('DOMContentLoaded', () => {
         window.location.href = 'home.html';
         return;
     }
+    renderUniversalHeader('operative');
+
     loadStudentReview();
     setupActionButtons();
+    renderUniversalFooter();
 });
 
 async function loadStudentReview() {

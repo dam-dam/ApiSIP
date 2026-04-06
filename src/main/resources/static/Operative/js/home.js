@@ -7,8 +7,9 @@ let selectedPlan = 'all';
 let selectedFilter = 'total';
 
 document.addEventListener('DOMContentLoaded', () => {
+    renderUniversalHeader('operative');
     init();
-    setupLogout();
+    renderUniversalFooter();
 });
 
 async function init() {
@@ -17,20 +18,6 @@ async function init() {
     await fetchSyllabus();
     await updateDashboard();
 }
-
-function setupLogout() {
-    document.getElementById('logoutBtn').addEventListener('click', async () => {
-        try {
-            const response = await fetch(API_LOGOUT, { method: 'POST' });
-            if (response.ok) {
-                window.location.href = '/index.html';
-            }
-        } catch (error) {
-            console.error("Error al cerrar sesión:", error);
-        }
-    });
-}
-
 //buscador solo parte visual, logica mas abajo==============================
 function setupListeners() {
     document.getElementById('searchInput').addEventListener('input', debounce(() => renderTable(), 300));

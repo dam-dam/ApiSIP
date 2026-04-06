@@ -1,20 +1,9 @@
 document.addEventListener('DOMContentLoaded', () => {
-    setupLogout();
+    renderUniversalHeader('students');
     initOperador();
-});
-function setupLogout() {
-    document.getElementById('logoutBtn').addEventListener('click', async () => {
-        try {
-            const response = await fetch(API_LOGOUT, { method: 'POST' });
-            if (response.ok) {
-                window.location.href = '/index.html';
-            }
-        } catch (error) {
-            console.error("Error al cerrar sesión:", error);
-        }
-    });
-}
+    renderUniversalFooter();
 
+});
 function initOperador() {
     const contenedor = document.getElementById('contenedor-tarjeta-operador');
     const visor = document.getElementById('visor-pdf-operador');
