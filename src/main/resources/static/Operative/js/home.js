@@ -133,7 +133,7 @@ async function renderTable() {
                 <td><strong>${s.offer?.syllabus?.code || 'N/A'}</strong></td>
                 <td>${s.name} ${s.fLastName} ${s.mLastName}</td>
                 <td>${s.enrollment}</td>
-                <td><span class="visual-status" style="background:#e0f2fe; color:#0369a1; padding:4px 10px; border-radius:20px; font-size:0.7rem; font-weight:800;">En Proceso</span></td>
+                <td><span class="visual-status">En Proceso</span></td>
             </tr>
         `).join('');
     } catch (e) { console.error("Error:", e); }

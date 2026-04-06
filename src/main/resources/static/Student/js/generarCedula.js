@@ -4,34 +4,14 @@ const API_GENERATE_CEDULA = '/cedula/generate';
 const API_VIEW_PDF = '/cedula/view-pdf';
 
 document.addEventListener('DOMContentLoaded', async () => {
-    loadUserProfile();
-    setupLogout();
-    // 1. Cargamos estados
+    renderUniversalHeader('students');
     await loadStates();
-    // 2. Cargamos datos previos si existen
     await loadExistingData();
-    // 3. Activamos el listener del formulario
     setupForm();
+    renderUniversalFooter();
 });
 
-async function loadUserProfile() {
-    try {
-        const resp = await fetch('/users/my-name');
-        if (resp.ok) {
-            const data = await resp.json();
-            const firstName = data.name.split(' ')[0];
-            const lastName = data.fLastName.split(' ')[0];
 
-            const nameEl = document.getElementById('user-pill-name');
-            const initialEl = document.getElementById('user-pill-initial');
-
-            if(nameEl) nameEl.textContent = `${firstName} ${lastName}`;
-            if(initialEl) initialEl.textContent = firstName.charAt(0).toUpperCase();
-        }
-    } catch (error) {
-        console.error("Error al cargar perfil:", error);
-    }
-}
 
 /**
  * Carga estados. Espera que StateDto tenga {id, name}
@@ -239,17 +219,6 @@ async function loadPdfPreview() {
             downloadBtn.style.display = "block";
         }
     } catch (e) { console.warn("PDF no disponible."); }
-}
-
-function setupLogout() {
-    const btn = document.getElementById('logoutBtn');
-    if(!btn) return;
-    btn.addEventListener('click', async () => {
-        try {
-            const response = await fetch('/auth/logout', { method: 'POST' });
-            if (response.ok) window.location.href = '/index.html';
-        } catch (error) { console.error("Error al cerrar sesión."); }
-    });
 }
 
 //Valida que los campos no esten vacios

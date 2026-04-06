@@ -1,31 +1,31 @@
-/*========================= Titulo estatico ejemplo: Registro de cartad =========================================================0*/
 .page-intro {
+    margin: 0.75rem clamp(1rem, 3%, 3rem);
     margin-bottom: 1.5rem;
     border-left: 5px solid #136b10;
-    padding-left: 1.5rem;
-
+    padding-left: clamp(1rem, 2vw, 1.5rem);
     position: sticky;
-
     top: 123px;
-
     background: var(--bg);
     padding-top: 1rem;
     padding-bottom: 1rem;
     z-index: 997;
-    width:95%;
-    margin:0.75rem 3rem;
-    /* box-shadow: 0 10px 15px -15px rgba(0,0,0,0.1);*/
+
+    /* El ancho se adapta mejor en móviles */
+    width: calc(100% - clamp(2rem, 6%, 6rem));
 }
 
 .page-intro h2 {
-    font-size: 1.6rem;
+/* Tamaño: mín 1.2rem, ideal 2.5vw, máx 1.8rem */
+    font-size: clamp(1.2rem, 2.5vw, 1.8rem);
     font-weight: 800;
     color: #136b10;
     margin: 0;
+    line-height: 1.2;
 }
 
 .page-intro p {
-    font-size: 0.95rem;
+/* Tamaño: mín 0.85rem, ideal 1.2vw, máx 1rem */
+    font-size: clamp(0.85rem, 1.2vw, 1rem);
     color: #6b7280;
     margin-top: 0.25rem;
 }
