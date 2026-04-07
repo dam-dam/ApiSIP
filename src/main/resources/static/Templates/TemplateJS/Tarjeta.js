@@ -26,7 +26,7 @@ function crearTarjetaDocumento(doc, data = {}, extraActionHtml = "", mostrarObse
             </div>
 
             <div class="doc-body-flex" style="${gridStyle} gap: 1.5rem; padding: 1.5rem;">
-                <div class="column-item upload-section" style="width: 100%;">
+                <div class="column-item upload-section" >
                     <input type="file" id="file-${doc.id}" style="display:none" accept=".pdf" ${estaAprobado ? 'disabled' : ''}>
                     <label for="file-${doc.id}" class="btn-browse ${estaAprobado ? 'disabled' : ''}" id="btn-${doc.id}" style="width: 100%; display: block; text-align: center;">
                         <i class="fas fa-file-upload"></i> Seleccionar PDF

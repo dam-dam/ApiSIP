@@ -1,54 +1,48 @@
-// Funciones para actualizar los nombres de los archivos seleccionados y mostrar el icono de borrado
-document.getElementById('cartaInput').addEventListener('change', function(e) {
-    const fileName = e.target.files.length ? e.target.files[0].name : 'No se ha seleccionado ningún archivo';
-    document.getElementById('cartaName').textContent = fileName;
-    document.getElementById('cartaDelete').style.display = e.target.files.length ? 'block' : 'none';
+
+const DOC_CONFIG = [
+    { id: 'reportes', label: 'Reportes Mensuales', typeCode: 'REPORTES_MENSUALES' },
+    { id: 'cartaAceptacion', label: 'Carta de Aceptacion', typeCode: 'CARTA_ACEPTACION' },
+];
+
+
+document.addEventListener('DOMContentLoaded', () => {
+    renderUniversalHeader('students');
+    tituloFijo(
+        "Documentos de Finalizacion",
+        "Por favor, carga tus archivos en formato PDF. Peso no mayor a 1MB."
+    );
+    initUI();
+    renderUniversalFooter();
 });
 
-document.getElementById('reporteInput').addEventListener('change', function(e) {
-    const fileName = e.target.files.length ? e.target.files[0].name : 'No se ha seleccionado ningún archivo';
-    document.getElementById('reporteName').textContent = fileName;
-    document.getElementById('reporteDelete').style.display = e.target.files.length ? 'block' : 'none';
-});
+function initUI(docsData = []) {
+    const container = document.getElementById('docs-container');
 
-document.getElementById('cartaTerminoInput').addEventListener('change', function(e) {
-    const fileName = e.target.files.length ? e.target.files[0].name : 'No se ha seleccionado ningún archivo';
-    document.getElementById('cartaTerminoName').textContent = fileName;
-    document.getElementById('cartaTerminoDelete').style.display = e.target.files.length ? 'block' : 'none';
-});
+    container.innerHTML = DOC_CONFIG.map(doc => {
+        const dataDoc = docsData.find(d => d.typeCode === doc.id) || {};
+        const estaAprobado = dataDoc.status === 'CORRECTO';
 
-document.getElementById('informeInput').addEventListener('change', function(e) {
-    const fileName = e.target.files.length ? e.target.files[0].name : 'No se ha seleccionado ningún archivo';
-    document.getElementById('informeName').textContent = fileName;
-    document.getElementById('informeDelete').style.display = e.target.files.length ? 'block' : 'none';
-});
+        // Definimos la acción especial solo para la cédula
+        let accionEspecial = "";
+        if (doc.id === 'cedula' && !estaAprobado) {
+            accionEspecial = `
+                <a href="generarCedula.html" class="btn-generate-inline">
+                    <i class="fas fa-file-signature"></i> Generar Cédula
+                </a>`;
+        }
 
-// Funciones para eliminar archivos
-document.getElementById('cartaDelete').addEventListener('click', function() {
-    document.getElementById('cartaInput').value = '';
-    document.getElementById('cartaName').textContent = 'No se ha seleccionado ningún archivo';
-    this.style.display = 'none';
-});
+        return crearTarjetaDocumento(doc, dataDoc, accionEspecial);
+    }).join('');
 
-document.getElementById('reporteDelete').addEventListener('click', function() {
-    document.getElementById('reporteInput').value = '';
-    document.getElementById('reporteName').textContent = 'No se ha seleccionado ningún archivo';
-    this.style.display = 'none';
-});
-
-document.getElementById('cartaTerminoDelete').addEventListener('click', function() {
-    document.getElementById('cartaTerminoInput').value = '';
-    document.getElementById('cartaTerminoName').textContent = 'No se ha seleccionado ningún archivo';
-    this.style.display = 'none';
-});
-
-document.getElementById('informeDelete').addEventListener('click', function() {
-    document.getElementById('informeInput').value = '';
-    document.getElementById('informeName').textContent = 'No se ha seleccionado ningún archivo';
-    this.style.display = 'none';
-});
-
-// Simular envío de formulario
-document.querySelector('.btn-guardar').addEventListener('click', function() {
-    alert('Documentos guardados correctamente. Serán revisados por el operativo.');
-});
+    // Re-activar los listeners de archivos
+    DOC_CONFIG.forEach(doc => {
+        const input = document.getElementById(`file-${doc.id}`);
+        if(input) {
+            input.addEventListener('change', (e) => {
+                if (e.target.files.length > 0) {
+                    document.getElementById(`name-${doc.id}`).textContent = e.target.files[0].name;
+                }
+            });
+        }
+    });
+}

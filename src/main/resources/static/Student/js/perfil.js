@@ -1,7 +1,9 @@
 document.addEventListener('DOMContentLoaded', () => {
+    renderUniversalHeader('students');
+    
     loadUserProfile();
-    setupLogout();
     setupPasswordUpdate();
+    renderUniversalFooter();
 });
 
 // Cargar datos desde la API
@@ -31,23 +33,6 @@ async function loadUserProfile() {
     } catch (error) {
         console.error("Error al cargar perfil:", error);
     }
-}
-
-// Funcionalidad de Cerrar Sesión
-function setupLogout() {
-    const btnLogout = document.getElementById('logoutBtn');
-    if (!btnLogout) return;
-
-    btnLogout.addEventListener('click', async () => {
-        try {
-            const response = await fetch('/auth/logout', { method: 'POST' });
-            if (response.ok) {
-                window.location.href = '/index.html';
-            }
-        } catch (error) {
-            console.error("Error al intentar cerrar sesión:", error);
-        }
-    });
 }
 
 // Funcionalidad de Actualizar Contraseña

@@ -1,17 +1,9 @@
 const urlParams = new URLSearchParams(window.location.search);
 const enrollment = urlParams.get('enrollment');
-
-// Endpoints ajustados al Controller
-const API_REVIEW_DATA = `/students/toReview?enrollment=${enrollment}&processStatus=DOC_INICIAL`;
-// Endpoints de acción(POST)
-const API_SAVE_DOC = `/documents/review`;
-//console.log("desde documentosInicio");
-// RUTA BASE PARA VER DOCUMENTOS (IMPORTANTE: Esto corrige el error del backend)
-// El backend tiene configurado /view-documents/**, así que debemos usar esa base
-
+const API_REVIEW_DATA = `/students/toReview?enrollment=${enrollment}&processStatus=DOC_INICIAL`;//get
+const API_SAVE_DOC = `/documents/review`; //post
 const DOC_PATH = '/view-documents/';
 
-// Variable global para mantener el estado actual de los documentos cargados
 let currentDocuments = [];
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -55,10 +47,31 @@ async function loadStudentReview() {
         currentDocuments = data.documents || [];
         renderDocuments(currentDocuments);
 
+        // 3. NUEVA LÓGICA: Verificar si habilitamos el botón de cartas
+        verificarAccesoACartas(currentDocuments);
+
     } catch (e) {
         console.error("Error cargando datos:", e);
         const list = document.getElementById('docs-list');
         if(list) list.innerHTML = `<div style="color:red; text-align:center;">Error al cargar datos: ${e.message}</div>`;
+    }
+}
+
+/**
+ * Función auxiliar para controlar la visibilidad del botón "Cartas"
+ */
+function verificarAccesoACartas(documentos) {
+    const btnContenedor = document.getElementById('irCartas');
+    if (!btnContenedor) return;
+
+    // Verificamos que TODOS los documentos tengan status "CORRECTO"
+    const todosListos = documentos.length > 0 && documentos.every(doc => doc.status === 'CORRECTO');
+
+    if (todosListos) {
+        btnContenedor.classList.add("visible")
+        console.log("Acceso a cartas habilitado: Todos los documentos están CORRECTOS.");
+    } else {
+        btnContenedor.classList.remove("visible");
     }
 }
 
@@ -248,4 +261,5 @@ function setupActionButtons() {
             }
         };
     }
+
 }
