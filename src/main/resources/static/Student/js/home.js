@@ -87,7 +87,7 @@ function renderProgress(apiData, docsData) {
         }
 
         // --- FASE 3 Y 4 ---
-        if ((idx === 2 || idx === 3) && todoAprobadoReal) {
+        if ((idx === 2 /*|| idx === 3*/) && todoAprobadoReal) {
             done = false;
             current = true;
         }

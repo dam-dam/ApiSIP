@@ -1,3 +1,9 @@
+:root{
+    --primary: #1A8C14;
+    --primary-dark: #136b10;
+    --primary-light: #e8f5e9;
+    --white: #ffffff;
+}
 header {
     background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
     padding: 0.7rem 3rem;
