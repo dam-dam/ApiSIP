@@ -82,7 +82,7 @@ public class DocumentService {
     }
 
     @Transactional
-    public void saveAcceptanceLetter(MultipartFile file, String enrollment, Integer userId) {
+    public void saveLetter(MultipartFile file, String enrollment, Integer userId) {
         UserSIP user = userRepository.findById(userId).orElseThrow(
                 () -> new BusinessException(ErrorCode.RESOURCE_NOT_FOUND));
         createNewDocument(user, enrollment, file);
