@@ -20,6 +20,11 @@ document.addEventListener('DOMContentLoaded', () => {
     initUI();
     loadStatus();
     renderUniversalFooter();
+    handleGlobalUpload();
+    const btnGuardar = document.getElementById('btn-global-save');
+    if (btnGuardar) {
+        btnGuardar.addEventListener('click', handleGlobalUpload);
+    }
 });
 
 function initUI(docsData = []) {
@@ -140,45 +145,43 @@ function updateCard(id, data) {
     }
 }
 
-/**
- * Procesa la subida de múltiples archivos
- */
+//boton para subir los archivos json
 async function handleGlobalUpload() {
     const btn = document.getElementById('btn-global-save');
     let filesSent = 0;
 
+    // Bloqueamos para evitar clics dobles
     btn.disabled = true;
+    const textoOriginal = btn.textContent;
     btn.textContent = "Subiendo archivos...";
 
-    for (const config of DOC_CONFIG) {
-        const input = document.getElementById(`file-${config.id}`);
-        if (input.files.length > 0) {
-            const formData = new FormData();
-            formData.append('file', input.files[0]);
-            formData.append('type', config.typeCode);
-            try {
-                await fetch(API_POST_UPLOAD, { method: 'POST', body: formData });
-                filesSent++;
-            } catch (e) { console.error("Error subiendo " + config.label); }
+    try {
+        for (const config of DOC_CONFIG) {
+            const input = document.getElementById(`file-${config.id}`);
+            if (input && input.files.length > 0) {
+                const formData = new FormData();
+                formData.append('file', input.files[0]);
+                formData.append('type', config.typeCode);
+                
+                try {
+                    const response = await fetch(API_POST_UPLOAD, { method: 'POST', body: formData });
+                    if (response.ok) filesSent++;
+                } catch (e) { 
+                    console.error("Error subiendo " + config.label, e); 
+                }
+            }
         }
-    }
 
-    if (filesSent > 0) {
-        // Modal de Éxito
-        showModal(
-            '¡Envío Exitoso!',
-            'Tus documentos han sido enviados correctamente.',
-            'success',
-            () => location.reload()
-        );
-    } else {
-        // Modal de Error/Advertencia
-        showModal(
-            'Sin cambios',
-            'No has seleccionado nuevos archivos para subir.',
-            'error'
-        );
+        if (filesSent > 0) {
+            showModal('¡Envío Exitoso!', 'Tus documentos han sido enviados.', 'success', () => location.reload());
+        } else {
+            showModal('Sin cambios', 'No has seleccionado archivos válidos.', 'error');
+            btn.disabled = false;
+            btn.textContent = textoOriginal;
+        }
+    } catch (globalError) {
+        console.error("Error crítico en la subida:", globalError);
         btn.disabled = false;
-        btn.textContent = "Guardar Cambios";
+        btn.textContent = textoOriginal;
     }
 }
