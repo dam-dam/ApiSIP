@@ -70,4 +70,14 @@ public class PasswordResetService {
         tokenReset.setUseDate(LocalDateTime.now());
         tokenResetRepository.save(tokenReset);
     }
+
+    @Transactional
+    public void changePassword(Integer userId, String newPassword) {
+        UserSIP user =  userService.getUserById(userId);
+
+        if(newPassword.equals(user.getPassword())){
+            throw new BusinessException(ErrorCode.PASSWORD_MISMATCH);
+        }
+        userService.updatePassword(user, newPassword);
+    }
 }

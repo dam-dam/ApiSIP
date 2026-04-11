@@ -81,6 +81,14 @@ public class DocumentService {
         }
     }
 
+    @Transactional(readOnly = true)
+    public DocumentStatusDto getLetter(Integer userId){
+        StudentProcess process = processService.findByStudentId(userId);
+        Document doc = findDocByProcessAndType(process, "CARTA_PRESENTACION");
+
+        return new DocumentStatusDto(doc.getDocumentType().getDescription(), doc.getDocumentStatus().getDescription(),
+                doc.getURL(), " ", "/view-document" + doc.getURL(), doc.getUploadDate());
+    }
     @Transactional
     public void saveLetter(MultipartFile file, String enrollment, Integer userId) {
         UserSIP user = userRepository.findById(userId).orElseThrow(
