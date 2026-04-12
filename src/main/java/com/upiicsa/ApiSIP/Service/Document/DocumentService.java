@@ -46,9 +46,12 @@ public class DocumentService {
     public Document findDocByProcessAndType(StudentProcess process, String typeName){
         DocumentType type = utilsService.findTypeByDescription(typeName);
 
-        return documentRepository.findByStudentProcessAndDocumentTypeAndCancellationDateIsNull
+      /*  return documentRepository.findByStudentProcessAndDocumentTypeAndCancellationDateIsNull
                 (process, type).orElseThrow(() -> new BusinessException(ErrorCode.RESOURCE_NOT_FOUND,
-                "Recurso: Documento"));
+                "Recurso: Documento"));*/
+        // Quitamos el .orElseThrow y ponemos .orElse(null)
+        return documentRepository.findByStudentProcessAndDocumentTypeAndCancellationDateIsNull
+                (process, type).orElse(null);
     }
 
     @Transactional(readOnly = true)

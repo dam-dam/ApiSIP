@@ -16,17 +16,19 @@ async function renderUniversalHeader(tipoUsuario = 'students') {
     // ui-components.js (dentro de tu función de renderUniversalHeader)
 
     headerElement.innerHTML = `
-    <div class="school-logo-container">
-                <img src="../Imagenes/Logo/svg/SIP_alpha.svg" alt="Logo Escuela" class="school-logo-img">
-    </div>
+    <div class="logo-group">
+        <div class="school-logo">
+                    <img src="../Imagenes/Logo/svg/SIP_alpha.svg" alt="Logo Escuela" class="school-logo-img">
+        </div>
 
-    <div class="header-brand">
-        <div class="title-box">
-            <h1>SISTEMA INSTITUCIONAL DE PRÁCTICAS PROFESIONALES</h1>
-            <p>${tipoUsuario === 'students' ? 'Portal Estudiantil' : 'Panel de Control Administrativo'}</p>
+        <div class="header-brand">
+            <div class="title-box">
+                <h1>SISTEMA INSTITUCIONAL DE PRÁCTICAS PROFESIONALES</h1>
+                <p>${tipoUsuario === 'students' ? 'Portal Estudiantil' : 'Panel de Control Administrativo'}</p>
+            </div>
         </div>
     </div>
-
+    
     <div class="user-actions">
         <div class="user-pill" id="userPill" title="Ver Perfil">
             <span id="user-pill-name">Cargando...</span>
@@ -44,12 +46,15 @@ async function renderUniversalHeader(tipoUsuario = 'students') {
         </div>
     </div>
 
-    <div class="logo-group">
-            <img src="../Imagenes/ipn.png" alt="IPN" class="logo-img">
-            <img src="../Imagenes/logo blanco.png" alt="UPIICSA" class="logo-img">
-    </div>
+    
 `;
 
+/*
+<div class="logo-group">
+        <img src="../Imagenes/ipn.png" alt="IPN" class="logo-img">
+        <img src="../Imagenes/logo blanco.png" alt="UPIICSA" class="logo-img">
+</div>
+*/
     // 2. Configurar Eventos
     setupHeaderEvents(tipoUsuario);
 

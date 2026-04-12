@@ -20,7 +20,6 @@ document.addEventListener('DOMContentLoaded', () => {
     initUI();
     loadStatus();
     renderUniversalFooter();
-    handleGlobalUpload();
     const btnGuardar = document.getElementById('btn-global-save');
     if (btnGuardar) {
         btnGuardar.addEventListener('click', handleGlobalUpload);
@@ -145,43 +144,60 @@ function updateCard(id, data) {
     }
 }
 
-//boton para subir los archivos json
+/**
+ * Procesa la subida de múltiples archivos
+ */ 
 async function handleGlobalUpload() {
     const btn = document.getElementById('btn-global-save');
     let filesSent = 0;
-
-    // Bloqueamos para evitar clics dobles
-    btn.disabled = true;
     const textoOriginal = btn.textContent;
-    btn.textContent = "Subiendo archivos...";
 
-    try {
-        for (const config of DOC_CONFIG) {
-            const input = document.getElementById(`file-${config.id}`);
-            if (input && input.files.length > 0) {
-                const formData = new FormData();
-                formData.append('file', input.files[0]);
-                formData.append('type', config.typeCode);
-                
-                try {
-                    const response = await fetch(API_POST_UPLOAD, { method: 'POST', body: formData });
-                    if (response.ok) filesSent++;
-                } catch (e) { 
-                    console.error("Error subiendo " + config.label, e); 
-                }
+    // 1. Obtener solo los inputs que SÍ tienen archivos
+    const inputsConArchivos = DOC_CONFIG.map(config => ({
+        config,
+        input: document.getElementById(`file-${config.id}`)
+    })).filter(item => item.input && item.input.files.length > 0);
+
+    if (inputsConArchivos.length === 0) {
+        showModal('Sin cambios', 'No has seleccionado archivos nuevos.', 'warning');
+        return;
+    }
+
+    btn.disabled = true;
+    btn.textContent = "Subiendo documentos...";
+
+    // 2. Enviamos uno por uno (como le gusta al Back actual)
+    for (const item of inputsConArchivos) {
+        const formData = new FormData();
+        formData.append('file', item.input.files[0]);
+        formData.append('type', item.config.typeCode);
+
+        try {
+            console.log(`Subiendo ${item.config.label} a la ruta de servidor...`);
+            
+            const response = await fetch(API_POST_UPLOAD, {
+                method: 'POST',
+                body: formData
+            });
+
+            if (response.ok) {
+                filesSent++;
+            } else {
+                // Si uno falla, capturamos el error pero seguimos con los demás
+                const errorMsg = await response.text();
+                console.error(`Error en ${item.config.label}: ${errorMsg}`);
             }
+        } catch (e) {
+            console.error(`Error de conexión en ${item.config.label}:`, e);
         }
+    }
 
-        if (filesSent > 0) {
-            showModal('¡Envío Exitoso!', 'Tus documentos han sido enviados.', 'success', () => location.reload());
-        } else {
-            showModal('Sin cambios', 'No has seleccionado archivos válidos.', 'error');
-            btn.disabled = false;
-            btn.textContent = textoOriginal;
-        }
-    } catch (globalError) {
-        console.error("Error crítico en la subida:", globalError);
+    // 3. Resultado final
+    if (filesSent > 0) {
+        showModal('¡Éxito!', `Se guardaron ${filesSent} archivo(s) en el servidor.`, 'success', () => location.reload());
+    } else {
+        showModal('Error', 'No se pudo subir ningún archivo. Revisa la consola.', 'error');
         btn.disabled = false;
         btn.textContent = textoOriginal;
     }
-}
+} 

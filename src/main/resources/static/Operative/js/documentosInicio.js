@@ -1,12 +1,18 @@
 const urlParams = new URLSearchParams(window.location.search);
 const enrollment = urlParams.get('enrollment');
-const API_REVIEW_DATA = `/students/toReview?enrollment=${enrollment}&processStatus=DOC_INICIAL`;//get
 const API_SAVE_DOC = `/documents/review`; //post
 const DOC_PATH = '/view-documents/';
 
 let currentDocuments = [];
+const MAPA_DOCS_INICIALES = {
+    'CEDULA_REGISTRO': 'Cedula de Registro',
+    'CONSTANCIA_IMSS': 'IMSS',
+    'CAPTURA_EMPRESA': 'Captura de Pantalla (Empresa)',
+    'CAPTURA_ALUMNO': 'Captura de Pantalla (Alumno)',
+    'HORARIO': 'Horario',
+};
 
-document.addEventListener('DOMContentLoaded', () => {
+document.addEventListener('DOMContentLoaded', async() => {
     if (!enrollment) {
         alert("No se especificó la boleta del alumno.");
         window.location.href = 'home.html';
@@ -14,52 +20,21 @@ document.addEventListener('DOMContentLoaded', () => {
     }
     renderUniversalHeader('operative');
 
-    loadStudentReview();
+   // 1. LLAMADA ÚNICA: El componente hace el fetch e inyecta el HTML solo
+    const data = await SeccionInfoEstudiante(enrollment, 'DOC_INICIAL');
+
+    // 2. Si el componente cargó bien los datos, seguimos con los documentos
+    if (data && data.documents) {
+        currentDocuments = data.documents;
+        renderDocuments(currentDocuments); // El que ya hicimos de las tarjetas
+        verificarAccesoACartas(currentDocuments);
+    }
     setupActionButtons();
     renderUniversalFooter();
 });
 
-async function loadStudentReview() {
-    try {
-        console.log("Consultando:", API_REVIEW_DATA);
-        const resp = await fetch(API_REVIEW_DATA);
-
-        const contentType = resp.headers.get("content-type");
-        if (!contentType || !contentType.includes("application/json")) {
-            throw new Error(`Respuesta no válida del servidor. Status: ${resp.status}`);
-        }
-
-        if (!resp.ok) {
-            console.error("Error HTTP:", resp.status);
-            return;
-        }
-
-        const data = await resp.json();
-
-        // 1. Llenar datos del encabezado
-        document.getElementById('st-name').textContent = data.name || '--';
-        document.getElementById('st-enrollment').textContent = data.enrollment || '--';
-        document.getElementById('st-career').textContent = data.career || '--';
-        document.getElementById('st-semester').textContent = data.semester || '--';
-        document.getElementById('st-syllabus').textContent = data.syllabus || '--';
-
-        // 2. Renderizar documentos
-        currentDocuments = data.documents || [];
-        renderDocuments(currentDocuments);
-
-        // 3. NUEVA LÓGICA: Verificar si habilitamos el botón de cartas
-        verificarAccesoACartas(currentDocuments);
-
-    } catch (e) {
-        console.error("Error cargando datos:", e);
-        const list = document.getElementById('docs-list');
-        if(list) list.innerHTML = `<div style="color:red; text-align:center;">Error al cargar datos: ${e.message}</div>`;
-    }
-}
-
-/**
- * Función auxiliar para controlar la visibilidad del botón "Cartas"
- */
+ //Función auxiliar para controlar la visibilidad del botón "Cartas"
+ 
 function verificarAccesoACartas(documentos) {
     const btnContenedor = document.getElementById('irCartas');
     if (!btnContenedor) return;
@@ -77,68 +52,30 @@ function verificarAccesoACartas(documentos) {
 
 function renderDocuments(docs) {
     const container = document.getElementById('docs-list');
+    container.innerHTML = '';
 
     if (!docs || docs.length === 0) {
-        container.innerHTML = '<div style="padding:20px; text-align:center; color:#666;">No hay documentos requeridos para este estado del proceso.</div>';
+        container.innerHTML = '<div style="padding:20px; text-align:center; color:#666;">No hay documentos iniciales para revisar.</div>';
         return;
     }
 
-    container.innerHTML = docs.map((doc, index) => {
-        const isRevisado = doc.status === 'CORRECTO';
-        const isIncorrecto = doc.status === 'INCORRECTO';
+    const fragment = document.createDocumentFragment();
 
-        // Verificar si hay nombre de archivo real
-        const hasFile = doc.fileName && doc.fileName.trim() !== '';
-        const isSinDoc = !hasFile || doc.status === 'SIN_CARGAR';
-        const fileUrl = hasFile ? `${DOC_PATH}${doc.fileName}` : '';
+    docs.forEach((doc, index) => {
+        // Configuramos la tarjeta para "Documentos Iniciales"
+        const opciones = {
+            index: index,
+            docPath: DOC_PATH,
+            mapaNombres: MAPA_DOCS_INICIALES, // Pasamos nuestro diccionario
+            onView: (url, title) => viewPdf(url, title) // Conectamos con tu función viewPdf
+        };
 
-        //antes del cambio de la bd: const isCargado = (doc.status === 'CARGADO' || doc.status === 'EN_REVISION' || isIncorrecto) && hasFile;
-        const isCargado = (doc.status === 'PENDIENTE' || isIncorrecto) && hasFile;
-        let cardClass = '';
-        if (isSinDoc) cardClass = 'card-sin-doc';
-        else if (isRevisado) cardClass = 'card-revisado';
-        else if (isIncorrecto) cardClass = 'card-cargado';
-        else cardClass = 'card-cargado';
+        // Creamos la tarjeta usando el componente reutilizable
+        const tarjeta = TarjetaOperador(doc, opciones);
+        fragment.appendChild(tarjeta);
+    });
 
-        let uploadDateStr = doc.uploadDate ? new Date(doc.uploadDate).toLocaleString('es-MX') : "Sin archivo cargado";
-        const uniqueId = doc.typeCode.replace(/\s+/g, '_') + '_' + index;
-
-        return `
-                <div class="doc-review-card ${cardClass}" data-typecode="${doc.typeCode}">
-                    <div class="doc-header">
-                        <div class="doc-title-box">
-                            <span class="doc-name">${doc.typeCode}</span>
-                            <span class="doc-date">${uploadDateStr}</span>
-                        </div>
-                        <div style="display:flex; gap:0.8rem; align-items:center;">
-                            ${isRevisado ? '<span class="locked-badge">Revisado Correcto</span>' : ''}
-                            ${isIncorrecto ? '<span class="locked-badge" style="background:var(--error);">Corrección Solicitada</span>' : ''}
-
-                            ${!isSinDoc && fileUrl ?
-            `<button class="btn-view" onclick="viewPdf('${fileUrl}', '${doc.typeCode}')">Ver Archivo</button>` :
-            '<button class="btn-view" disabled style="opacity:0.5; cursor:not-allowed;">Sin Archivo</button>'
-        }
-                        </div>
-                    </div>
-
-                    ${isCargado ? `
-                    <div class="status-actions">
-                        <label class="action-label opt-ok">
-                            <input type="radio" name="st-${uniqueId}" value="REVISADO_CORRECTO" ${doc.status === 'REVISADO_CORRECTO' ? 'checked' : ''}>
-                            Correcto
-                        </label>
-                        <label class="action-label opt-err">
-                            <input type="radio" name="st-${uniqueId}" value="REVISADO_INCORRECTO" ${doc.status === 'REVISADO_INCORRECTO' ? 'checked' : ''}>
-                            Incorrecto
-                        </label>
-                    </div>
-                    <textarea class="comment-area" id="comm-${uniqueId}" placeholder="Observaciones de revisión...">${doc.comment || ''}</textarea>
-                    ` : ''}
-
-                    ${isSinDoc ? `<div style="font-size:0.85rem; color:var(--text-muted); font-style:italic;">El alumno aún no ha cargado este documento.</div>` : ''}
-                </div>
-            `;
-    }).join('');
+    container.appendChild(fragment);
 }
 
 function viewPdf(url, title) {
@@ -166,20 +103,8 @@ function setupActionButtons() {
 
                 const uniqueId = doc.typeCode.replace(/\s+/g, '_') + '_' + index;
                 const radio = document.querySelector(`input[name="st-${uniqueId}"]:checked`);
-                //console.log("Buscando input con name: st-" + uniqueId);
+
                 const commentArea = document.getElementById(`comm-${uniqueId}`);
-
-                //ver que esta madando el script
-                //console.log("Revisando ID:", uniqueId, "Radio encontrado:", !!radio, "Comentario:", commentArea ? commentArea.value : "No existe");
-
-                /* cambiarlo a como me dijo Yael
-                if (radio) {
-                    reviews.push({
-                        typeCode: doc.typeCode,
-                        status: radio.value,
-                        comment: commentArea ? commentArea.value : ""
-                    });
-                }*/
                 if (radio) {
                     reviews.push({
                         // Cambiamos typeCode por typeName

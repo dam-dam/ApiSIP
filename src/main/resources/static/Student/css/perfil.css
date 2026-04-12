@@ -157,5 +157,4 @@ body {
     .container { grid-template-columns: 1fr; }
     .data-grid { grid-template-columns: 1fr; gap: 1.2rem; }
     .logo-box { border: none; padding: 0; justify-content: center; }
-    .user-actions { width: 100%; justify-content: center; }
 }

@@ -21,7 +21,10 @@ header {
     border-bottom-left-radius: 15px;
     border-bottom-right-radius: 15px;
 }
-.school-logo-container {
+.logo-group{
+    display: flex;
+}
+.school-logo {
     display: flex;
     align-items: center;
 }
@@ -42,7 +45,12 @@ header {
 .title-box p { font-size: 0.7rem; opacity: 0.9; margin: 0; }
 
 /* PÍLDORA Y BOTÓN SALIR */
-.user-actions { display: flex; align-items: center; gap: 0.8rem; }
+.user-actions { 
+    display: flex; 
+    align-items: center; 
+    gap: 0.8rem;
+    margin: 0 5rem 0 0; 
+}
 .user-pill {
     display: flex; align-items: center; gap: 0.75rem; background: var(--white);
     padding: 0.4rem 1rem; border-radius: 50px; color: var(--primary-dark);
@@ -67,103 +75,11 @@ header {
         text-align: center;
     }
     .header-brand{display:none;}
-    .logo-group{display:none;}
-    .user-actions { width: 100%; justify-content: center; }
+    /*.logo-group{display:none;}*/
+    .user-actions { 
+        width: 100%;
+        justify-content: end;  
+        margin: 0; 
+    }
 
 }
-/* --- HEADER DISEÑO DIFERENTE --- */
-
-/*
-header {
-    background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
-    padding: 1.5rem 3rem;
-    color: white;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    position: sticky;
-    top: 0;
-    z-index: 1000;
-    box-shadow: 0 4px 15px rgba(0,0,0,0.2);
-}
-
-.header-brand {
-    display: flex;
-    align-items: center;
-    gap: 2rem;
-}
-
-.logo-group {
-    display: flex;
-    align-items: center;
-    gap: 1rem;
-    background: rgba(255, 255, 255, 0.15);
-    padding: 0.5rem 1rem;
-    border-radius: 12px;
-    backdrop-filter: blur(10px);
-}
-
-.logo-img {
-    height: 48px;
-    filter: brightness(0) invert(1);
-}
-
-.title-box h1 {
-    font-size: 1.5rem;
-    font-weight: 800;
-    letter-spacing: 1px;
-    text-shadow: 0 2px 4px rgba(0,0,0,0.2);
-    margin: 0;
-}
-
-.title-box p {
-    font-size: 0.8rem;
-    opacity: 0.9;
-    font-weight: 500;
-    margin: 0;
-}
-
-.user-actions {
-    display: flex;
-    align-items: center;
-    gap: 0.8rem;
-}
-
-.user-pill {
-    display: flex;
-    align-items: center;
-    gap: 0.75rem;
-    background: var(--white);
-    padding: 0.4rem 1rem;
-    border-radius: 50px;
-    color: var(--primary-dark);
-    cursor: pointer;
-    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-    transition: transform 0.2s;
-}
-
-.user-pill:hover { transform: scale(1.03); }
-.user-pill span { font-weight: 700; font-size: 0.9rem; }
-.user-avatar { width: 30px; height: 30px; background: var(--primary); color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold; }
-
-.btn-logout {
-    background: rgba(255, 255, 255, 0.2);
-    border: 1px solid rgba(255, 255, 255, 0.4);
-    color: white;
-    width: 40px;
-    height: 40px;
-    border-radius: 50%;
-    cursor: pointer;
-    transition: all 0.2s;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    padding: 0;
-    line-height: 0;
-}
-
-.btn-logout:hover {
-    background: #b91c1c;
-    border-color: #b91c1c;
-    transform: rotate(-10deg) scale(1.1);
-}*/
