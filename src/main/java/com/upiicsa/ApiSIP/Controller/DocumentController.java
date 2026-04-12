@@ -48,6 +48,13 @@ public class DocumentController {
         return ResponseEntity.ok().body("Uploaded successfully");
     }
 
+    @PostMapping("/downloadLetter")
+    @PreAuthorize("hasAnyRole('ALUMNO')")
+    public ResponseEntity<DocumentStatusDto>  downloadDocumentLetter(){
+
+        return documentService.getLetter(getUserId());
+    }
+
     @PostMapping("/review")
     @PreAuthorize("hasAnyRole('ADMINISTRADOR', 'OPERADOR')")
     public ResponseEntity<Boolean> reviewedDocument(@RequestParam String enrollment,
