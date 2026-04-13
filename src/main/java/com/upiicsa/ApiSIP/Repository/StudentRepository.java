@@ -25,12 +25,10 @@ public interface StudentRepository extends JpaRepository<Student, Integer> {
             "LEFT JOIN s.offer o " +
             "LEFT JOIN o.career c " +
             "LEFT JOIN o.syllabus sy " +
-            "WHERE (:career = 'all' OR (c IS NOT NULL AND c.acronym = :career)) " +
-            "AND (:plan = 'all' OR (sy IS NOT NULL AND sy.code = :plan)) " +
+            "WHERE (:career = 'all' OR c.acronym = :career) " +
+            "AND (:plan = 'all' OR sy.code = :plan) " +
             "AND (:search IS NULL OR :search = '' OR " +
-            "    LOWER(s.name) LIKE LOWER(CONCAT('%', :search, '%')) OR " +
-            "    LOWER(s.fLastName) LIKE LOWER(CONCAT('%', :search, '%')) OR " +
-            "    LOWER(s.mLastName) LIKE LOWER(CONCAT('%', :search, '%')) OR " +
+            "    LOWER(FUNCTION('CONCAT_WS', ' ', s.fLastName, s.mLastName, s.name)) LIKE LOWER(CONCAT('%', :search, '%')) OR " +
             "    s.enrollment LIKE CONCAT('%', :search, '%'))")
     Page<Student> findFiltered(
             @Param("search") String search,

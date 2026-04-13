@@ -9,12 +9,14 @@ import com.upiicsa.ApiSIP.Model.Catalogs.DocumentStatus;
 import com.upiicsa.ApiSIP.Repository.Document_Process.DocumentReviewRepository;
 import com.upiicsa.ApiSIP.Service.StudentService;
 import com.upiicsa.ApiSIP.Service.UserService;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.List;
 
+@Slf4j
 @Service
 public class ReviewDocumentService {
 
@@ -54,6 +56,9 @@ public class ReviewDocumentService {
                     .reviewDate(LocalDateTime.now())
                     .build();
             documentReviewRepository.save(newReview);
+
+            log.info("Operador ID [{}] reviso el documento ID [{}] (Tipo: {}) como [{}] - comentario: '{}'",
+                    user.getId(), document.getId(), document.getDocumentType().getDescription(), comment);
         }
     }
 
@@ -62,11 +67,16 @@ public class ReviewDocumentService {
         StudentProcess process = processService.findByEnrollment(enrollment);
         UserSIP user = userService.getUserById(userId);
 
+        log.info("Operador ID [{}] inicio revisión de documentos para la matrícula [{}]", userId, enrollment);
+
         for (ReviewDocumentDto dto : reviewsDto) {
             Document doc = documentService.findDocByProcessAndType(process, dto.typeName());
 
-            save(doc, user, dto.approved(), dto.comment());
+            if(doc != null) {
+                save(doc, user, dto.approved(), dto.comment());
+            }
         }
         processService.validateUpdateStatus(process, documentService.findByProcessAndStatus(process.getProcessStatus()));
+        log.info("Operador ID [{}] finalizo la revisión para la matrícula [{}]", userId, enrollment);
     }
 }

@@ -2,6 +2,7 @@ package com.upiicsa.ApiSIP.Service;
 
 import com.upiicsa.ApiSIP.Dto.Document.DocumentStatusDto;
 import com.upiicsa.ApiSIP.Dto.Student.InfoInstitutionalDto;
+import com.upiicsa.ApiSIP.Dto.Student.ResponseStudentDto;
 import com.upiicsa.ApiSIP.Dto.Student.StudentRegistrationDto;
 import com.upiicsa.ApiSIP.Dto.Student.StudentReviewDto;
 import com.upiicsa.ApiSIP.Dto.User.DataDto;
@@ -67,8 +68,22 @@ public class StudentService {
     }
 
     @Transactional(readOnly = true)
-    public Page<Student> getStudentsByFilters(String search, String career, String plan, Pageable pageable) {
-        return studentRepository.findFiltered(search, career, plan, pageable);
+    public Page<ResponseStudentDto> getStudentsByFilters(String search, String career, String plan, Pageable pageable) {
+        Page<Student> students = studentRepository.findFiltered(search, career, plan, pageable);
+
+        return students.map(student -> {
+
+            String status = processService.findByStudentId(student.getId()).getProcessStatus().getDescription();
+
+            return new ResponseStudentDto(
+                    student.getName(),
+                    student.getFLastName(),
+                    student.getMLastName(),
+                    student.getEnrollment(),
+                    student.getOffer().getSyllabus().getCode(),
+                    status
+            );
+        });
     }
 
     @Transactional

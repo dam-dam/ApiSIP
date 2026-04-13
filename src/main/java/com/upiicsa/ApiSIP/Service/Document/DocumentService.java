@@ -46,10 +46,6 @@ public class DocumentService {
     public Document findDocByProcessAndType(StudentProcess process, String typeName){
         DocumentType type = utilsService.findTypeByDescription(typeName);
 
-      /*  return documentRepository.findByStudentProcessAndDocumentTypeAndCancellationDateIsNull
-                (process, type).orElseThrow(() -> new BusinessException(ErrorCode.RESOURCE_NOT_FOUND,
-                "Recurso: Documento"));*/
-        // Quitamos el .orElseThrow y ponemos .orElse(null)
         return documentRepository.findByStudentProcessAndDocumentTypeAndCancellationDateIsNull
                 (process, type).orElse(null);
     }
@@ -89,9 +85,14 @@ public class DocumentService {
         StudentProcess process = processService.findByStudentId(userId);
         Document doc = findDocByProcessAndType(process, "CARTA_PRESENTACION");
 
-        return new DocumentStatusDto(doc.getDocumentType().getDescription(), doc.getDocumentStatus().getDescription(),
-                doc.getURL(), " ", "/view-document" + doc.getURL(), doc.getUploadDate());
+        if(doc != null){
+            return new DocumentStatusDto(doc.getDocumentType().getDescription(), doc.getDocumentStatus().getDescription(),
+                    doc.getURL(), " ", "/view-document" + doc.getURL(), doc.getUploadDate());
+        } else {
+            throw new BusinessException(ErrorCode.RESOURCE_NOT_FOUND);
+        }
     }
+
     @Transactional
     public void saveLetter(MultipartFile file, String enrollment, Integer userId) {
         UserSIP user = userRepository.findById(userId).orElseThrow(

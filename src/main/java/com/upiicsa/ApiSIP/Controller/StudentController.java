@@ -11,6 +11,7 @@ import com.upiicsa.ApiSIP.Service.Document.StudentProcessService;
 import com.upiicsa.ApiSIP.Service.StudentService;
 import com.upiicsa.ApiSIP.Utils.AuthHelper;
 import jakarta.validation.Valid;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
@@ -21,6 +22,7 @@ import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import java.net.URI;
 import java.util.List;
 
+@Slf4j
 @RestController
 @RequestMapping("/students")
 public class StudentController {
@@ -36,12 +38,11 @@ public class StudentController {
     @GetMapping("/filtered")
     @PreAuthorize("hasAnyRole('ADMINISTRADOR', 'OPERADOR')")
     public ResponseEntity<Page<ResponseStudentDto>> getAllStudents(Pageable pageable,
-            @RequestParam(required = false) String search, @RequestParam(defaultValue = "all") String career,
-            @RequestParam(defaultValue = "all") String plan) {
+              @RequestParam(required = false) String search, @RequestParam(defaultValue = "all") String career,
+              @RequestParam(defaultValue = "all") String plan) {
 
-        Page<Student> students = studentService.getStudentsByFilters(search, career, plan, pageable);
-        return ResponseEntity.ok(students
-                .map(student -> new ResponseStudentDto(student)));
+        Page<ResponseStudentDto> students = studentService.getStudentsByFilters(search, career, plan, pageable);
+        return ResponseEntity.ok(students);
     }
 
     @GetMapping("/data")
@@ -76,6 +77,9 @@ public class StudentController {
     public ResponseEntity<StudentReviewDto> getStudentReview(
             @RequestParam String enrollment,
             @RequestParam String processStatus) {
+
+        log.info("Operador ID [{}] consultó la informacion de la matrícula [{}] para revisión en estado [{}]",
+                AuthHelper.getAuthenticatedUserId(), enrollment, processStatus);
 
         return ResponseEntity.ok(studentService.dataToReview(enrollment, processStatus));
     }
