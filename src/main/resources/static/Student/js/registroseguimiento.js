@@ -7,6 +7,7 @@ const DOC_CONFIG = [
 
 document.addEventListener('DOMContentLoaded', () => {
     renderUniversalHeader('students');
+    volverAtras();
     tituloFijo(
         "Documentos de Finalizacion",
         "Por favor, carga tus archivos en formato PDF. Peso no mayor a 1MB."

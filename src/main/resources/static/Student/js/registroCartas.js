@@ -1,116 +1,202 @@
+const API_GET_STATUS = '/documents/my-status'; //get
+const API_POST_UPLOAD = '/documents/upload';//post
+const DOC_PATH = '/view-documents/'; //post
+
+// Mapeo exacto según tu catálogo de backend
+const DOC_CONFIG = [
+    { id: 'CP', label: 'Carta de presentación', typeCode: 'CARTA_PRESENTACION' },
+    { id: 'CA', label: 'Carta de aceptacion', typeCode: 'CARTA_ACEPTACION' },
+    
+];
+
 document.addEventListener('DOMContentLoaded', () => {
     renderUniversalHeader('students');
+    volverAtras(); 
     tituloFijo(
-        "Registro de Carta de Aceptación",
+        "Cartas de Presentación y Aceptación",
         "Por favor, carga tus archivos en formato PDF. Peso no mayor a 1MB."
     );
-    initRegistroCarta();
+    initUI();
+    loadStatus();
     renderUniversalFooter();
+    const btnGuardar = document.getElementById('btn-global-save');
+    if (btnGuardar) {
+        btnGuardar.addEventListener('click', handleGlobalUpload);
+    }
 });
-function initRegistroCarta() {
-    const contenedor = document.getElementById('contenedor-tarjeta-carta');
-    const contenedorVisorPdf = document.getElementById('contenedor-visor-pdf');
-    const botonEnviarCarta = document.getElementById('boton-enviar-carta');
 
+function initUI(docsData = []) {
+    const container = document.getElementById('docs-container');
 
+    container.innerHTML = DOC_CONFIG.map(doc => {
+        const dataDoc = docsData.find(d => d.typeCode === doc.id) || {};
+        const estaAprobado = dataDoc.status === 'CORRECTO';
 
+        // Definimos la acción especial solo para la cédula
+        let accionEspecial = "";
+        if (doc.id === 'cedula' && !estaAprobado) {
+            accionEspecial = `
+                <a href="generarCedula.html" class="btn-generate-inline">
+                    <i class="fas fa-file-signature"></i> Generar Cédula
+                </a>`;
+        }
 
-    // Configuración de la tarjeta
-    const configCarta = { id: 'carta_aceptacion', label: 'Carta de Aceptación' };
+        return crearTarjetaDocumento(doc, dataDoc, accionEspecial);
+    }).join('');
 
-    // Datos iniciales (esto podría venir de un fetch en el futuro)
-    const datosServidor = { status: 'SIN CARGAR', observations: 'Pendiente de entrega.' };
+    // Re-activar los listeners de archivos
+    DOC_CONFIG.forEach(doc => {
+        const input = document.getElementById(`file-${doc.id}`);
+        if(input) {
+            input.addEventListener('change', (e) => {
+                if (e.target.files.length > 0) {
+                    document.getElementById(`name-${doc.id}`).textContent = e.target.files[0].name;
+                }
+            });
+        }
+    });
+}
+async function loadStatus() {
+    try {
+        const urlCompleta = API_GET_STATUS + "?processStatus=CARTAS";
+        const resp = await fetch(urlCompleta);
 
-    // 1. Renderizamos la tarjeta usando el componente global
-    if (contenedor) {
-        contenedor.innerHTML = crearTarjetaDocumento(configCarta, datosServidor);
+        if (!resp.ok) {
+            console.error("Error HTTP:", resp.status);
+            return;
+        }
+
+        const isJson = resp.headers.get("content-type")?.includes("application/json");
+        if (!isJson) {
+            console.error("El servidor no devolvió JSON. Probablemente te redirigió al login.");
+            return;
+        }
+
+        const data = await resp.json();
+        console.log("¡Por fin llegaron los datos!:", data);
+
+        data.forEach(item => {
+            const config = DOC_CONFIG.find(c => c.typeCode === item.typeCode);
+            if (config) updateCard(config.id, item);
+        });
+
+    } catch (e) {
+        console.error("Error cargando estatus:", e);
+    }
+}
+
+function updateCard(id, data) {
+    const card = document.getElementById(`card-${id}`);
+    const badge = document.getElementById(`badge-${id}`);
+    const comment = document.getElementById(`comment-${id}`);
+    const display = document.getElementById(`name-${id}`);
+    const input = document.getElementById(`file-${id}`);
+    const labelBtn = document.getElementById(`btn-${id}`);
+    const dateEl = document.getElementById(`date-${id}`);
+
+    card.className = "doc-card"; // Reset
+    let statusCls = "status-none", badgeCls = "badge-none", label = "Sin Cargar";
+
+    // Mapeo de estados del backend
+    if (data.status === "CORRECTO") {
+        statusCls = "status-correct"; badgeCls = "badge-correct"; label = "Aceptado";
+        input.disabled = true;
+        labelBtn.style.opacity = "0.5";
+        labelBtn.style.pointerEvents = "none";
+    } else if (data.status === "INCORRECTO") {
+        statusCls = "status-incorrect"; badgeCls = "badge-incorrect"; label = "Rechazado";
+    } else if (data.status === "PENDIENTE") {
+        statusCls = "status-pending"; badgeCls = "badge-pending"; label = "En Revisión";
+    } else if (data.fileName) {
+        statusCls = "status-pending"; badgeCls = "badge-pending"; label = "Pendiente";
     }
 
-    // 2. Obtenemos las referencias a los elementos creados por el componente
-    const entradaArchivo = document.getElementById(`file-${configCarta.id}`);
-    const displayNombre = document.getElementById(`name-${configCarta.id}`);
+    card.classList.add(statusCls);
+    badge.textContent = label;
+    badge.className = `status-badge ${badgeCls}`;
+    comment.textContent = data.comment || "Sin observaciones.";
 
-    // 3. Listener para el cambio de archivo (Validaciones y Vista Previa)
-    if (entradaArchivo) {
-        entradaArchivo.addEventListener('change', (evento) => {
-            const archivo = evento.target.files[0];
+    if (data.fileName) {
+        // Lógica para la fecha
+        let dateStr = '(--/--/---- --:--)';
+        if (data.uploadDate) {
+            const dateObj = new Date(data.uploadDate);
+            dateStr = dateObj.toLocaleDateString('es-MX', {
+                day: '2-digit',
+                month: '2-digit',
+                year: 'numeric',
+                hour: '2-digit',
+                minute:'2-digit'
+            }).replace(',', '');
+        }
+        // Actualizar la fecha en el header
+        if(dateEl) dateEl.textContent = dateStr;
 
-            if (archivo) {
-                // Validación de Formato
-                if (archivo.type !== 'application/pdf') {
-                    showModal('Formato no válido', 'Solo puedes subir archivos PDF', 'error');
-                    evento.target.value = '';
-                    return;
-                }
+        // Actualizar solo el nombre del archivo con su enlace
+       // display.innerHTML = `<a href="${DOC_PATH}${data.fileName}" target="_blank" class="file-link">${data.fileName}</a>`;
+        // Actualizar solo el nombre del archivo con su enlace e icono
+        display.innerHTML = `
+            <a href="${DOC_PATH}${data.fileName}" target="_blank" class="file-link view-document-btn">
+                <i class="fa-solid fa-eye"></i> Ver documento
+            </a>
+        `;
+    }
+}
 
-                // Validación de Tamaño (1MB)
-                if (archivo.size > 1024 * 1024) {
-                    showModal('Archivo muy pesado', 'El PDF no debe pesar más de 1MB', 'error');
-                    evento.target.value = '';
-                    return;
-                }
+/**
+ * Procesa la subida de múltiples archivos
+ */ 
+async function handleGlobalUpload() {
+    const btn = document.getElementById('btn-global-save');
+    let filesSent = 0;
+    const textoOriginal = btn.textContent;
 
-                // UI: Nombre del archivo y habilitar botón
-                if (displayNombre) displayNombre.textContent = archivo.name;
-                if (botonEnviarCarta) botonEnviarCarta.disabled = false;
+    // 1. Obtener solo los inputs que SÍ tienen archivos
+    const inputsConArchivos = DOC_CONFIG.map(config => ({
+        config,
+        input: document.getElementById(`file-${config.id}`)
+    })).filter(item => item.input && item.input.files.length > 0);
 
-                // UI: Vista Previa Gigante
-                mostrarVistaPrevia(archivo, contenedorVisorPdf);
+    if (inputsConArchivos.length === 0) {
+        showModal('Sin cambios', 'No has seleccionado archivos nuevos.', 'warning');
+        return;
+    }
+
+    btn.disabled = true;
+    btn.textContent = "Subiendo documentos...";
+
+    // 2. Enviamos uno por uno (como le gusta al Back actual)
+    for (const item of inputsConArchivos) {
+        const formData = new FormData();
+        formData.append('file', item.input.files[0]);
+        formData.append('type', item.config.typeCode);
+
+        try {
+            console.log(`Subiendo ${item.config.label} a la ruta de servidor...`);
+            
+            const response = await fetch(API_POST_UPLOAD, {
+                method: 'POST',
+                body: formData
+            });
+
+            if (response.ok) {
+                filesSent++;
+            } else {
+                // Si uno falla, capturamos el error pero seguimos con los demás
+                const errorMsg = await response.text();
+                console.error(`Error en ${item.config.label}: ${errorMsg}`);
             }
-        });
+        } catch (e) {
+            console.error(`Error de conexión en ${item.config.label}:`, e);
+        }
     }
 
-    // 4. Listener para el envío
-    if (botonEnviarCarta) {
-        botonEnviarCarta.addEventListener('click', () => {
-            // Aquí iría tu fetch de envío
-            showModal('Enviando', 'Subiendo tu carta de aceptación...', 'info');
-        });
-    }
-
-    const urlDesdeServidor = datosServidor.url_carta_presentacion || null;
-
-    // LLAMAMOS A LA FUNCIÓN DE DESCARGA
-    manejarDescargaCarta(urlDesdeServidor);
-}
-
-// Función auxiliar para la vista previa (para no amontonar código arriba)
-function mostrarVistaPrevia(archivo, contenedor) {
-    if (!contenedor) return;
-
-    // Liberar memoria de una URL previa si existe
-    const iframeAnterior = contenedor.querySelector('iframe');
-    if (iframeAnterior) URL.revokeObjectURL(iframeAnterior.src);
-
-    const url = URL.createObjectURL(archivo);
-    contenedor.innerHTML = `
-        <iframe src="${url}#toolbar=0&navpanes=0"
-                title="Vista previa del documento"
-                style="width: 100%; height: 80vh; border: none; border-radius: 12px; background: white; box-shadow: 0 4px 12px rgba(0,0,0,0.1);">
-        </iframe>
-    `;
-}
-
-function manejarDescargaCarta(url) {
-    const botonDescargar = document.getElementById('boton-descargar-carta');
-    if (!botonDescargar) return;
-
-    if (url && url !== "") {
-        // Si hay URL, habilitamos el botón y cambiamos el estilo
-        botonDescargar.disabled = false;
-        botonDescargar.style.opacity = "1";
-        botonDescargar.style.cursor = "pointer";
-
-        // Al dar clic, abre el archivo
-        botonDescargar.onclick = () => {
-            window.open(url, '_blank');
-            // Opcional: un mensajito de éxito
-            console.log("Descarga de carta iniciada");
-        };
+    // 3. Resultado final
+    if (filesSent > 0) {
+        showModal('¡Éxito!', `Se guardaron ${filesSent} archivo(s) en el servidor.`, 'success', () => location.reload());
     } else {
-        // Si no hay URL, nos aseguramos que esté deshabilitado
-        botonDescargar.disabled = true;
-        botonDescargar.style.opacity = "0.5";
-        botonDescargar.onclick = null;
+        showModal('Error', 'No se pudo subir ningún archivo. Revisa la consola.', 'error');
+        btn.disabled = false;
+        btn.textContent = textoOriginal;
     }
-}
+} 

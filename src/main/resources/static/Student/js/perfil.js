@@ -1,6 +1,6 @@
 document.addEventListener('DOMContentLoaded', () => {
     renderUniversalHeader('students');
-    
+    volverAtras();
     loadUserProfile();
     setupPasswordUpdate();
     renderUniversalFooter();

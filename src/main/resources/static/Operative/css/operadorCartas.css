@@ -26,29 +26,6 @@ body {
 }
 
 /* --- NAVEGACIÓN STICKY --- */
-.nav-bar {
-    background: var(--white);
-    padding: 0.75rem 3rem;
-    border-bottom: 1px solid var(--border);
-    display: flex;
-    align-items: center;
-    position: sticky;
-    top: 73px;
-    z-index: 998;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.05);
-}
-
-.back-link {
-    text-decoration: none;
-    color: var(--primary-dark);
-    font-weight: 700;
-    font-size: 0.9rem;
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-    transition: transform 0.2s;
-}
-.back-link:hover { transform: translateX(-5px); color: var(--primary); }
 
 /* --- CONTENIDO --- */
 .container {

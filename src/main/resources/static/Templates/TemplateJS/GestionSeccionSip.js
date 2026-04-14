@@ -1,4 +1,7 @@
 
+const urlParams = new URLSearchParams(window.location.search);
+const enrollment = urlParams.get('enrollment');
+
 async function InicializarSeccionRevision(config) {
     const {
         statusSeccion,      // 'DOC_INICIAL', 'CARTAS', 'DOC_FINAL'
@@ -8,29 +11,29 @@ async function InicializarSeccionRevision(config) {
         contenedorListaId = 'docs-list'
     } = config;
 
-    // 1. Validación de boleta 
+    // Validación de boleta 
     if (!enrollment) {
         alert("No se especificó la boleta del alumno.");
         window.location.href = 'home.html';
         return;
     }
     try {
-        // 2. Carga de Datos Única
+        // Carga de Datos Única
         const data = await SeccionInfoEstudiante(enrollment, statusSeccion);
 
         if (data && data.documents) {
             currentDocuments = data.documents;
             
-            // 3. Renderizado Dinámico
+            // Renderizado Dinámico
             renderDocumentsGenerico(currentDocuments, mapaNombres, contenedorListaId);
             
-            // 4. Verificación de flujo (Si existe botón para la siguiente etapa)
+            // Verificación de flujo (Si existe botón para la siguiente etapa)
             if (proximaEtapa) {
                 proximaEtapa.functionVerificar(currentDocuments, proximaEtapa.idBoton);
             }
         }
 
-        // 5. Configurar botones de guardado (POST)
+        // Configurar botones de guardado (POST)
         setupActionButtonsGenerico(endpointPost);
 
     } catch (error) {

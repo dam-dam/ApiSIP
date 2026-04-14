@@ -5,6 +5,7 @@ const API_VIEW_PDF = '/cedula/view-pdf';
 
 document.addEventListener('DOMContentLoaded', async () => {
     renderUniversalHeader('students');
+    volverAtras();
     await loadStates();
     await loadExistingData();
     setupForm();

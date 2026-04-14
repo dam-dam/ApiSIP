@@ -13,6 +13,7 @@ const DOC_CONFIG = [
 
 document.addEventListener('DOMContentLoaded', () => {
     renderUniversalHeader('students');
+    volverAtras(); 
     tituloFijo(
         "Documentación Inicial",
         "Por favor, carga tus archivos en formato PDF. Peso no mayor a 1MB."
@@ -132,10 +133,7 @@ function updateCard(id, data) {
         }
         // Actualizar la fecha en el header
         if(dateEl) dateEl.textContent = dateStr;
-
-        // Actualizar solo el nombre del archivo con su enlace
-       // display.innerHTML = `<a href="${DOC_PATH}${data.fileName}" target="_blank" class="file-link">${data.fileName}</a>`;
-        // Actualizar solo el nombre del archivo con su enlace e icono
+         // Actualizar solo el nombre del archivo con su enlace e icono
         display.innerHTML = `
             <a href="${DOC_PATH}${data.fileName}" target="_blank" class="file-link view-document-btn">
                 <i class="fa-solid fa-eye"></i> Ver documento

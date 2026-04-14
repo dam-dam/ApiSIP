@@ -1,5 +1,3 @@
-const urlParams = new URLSearchParams(window.location.search);
-const enrollment = urlParams.get('enrollment');
 
 const MAPA_CARTAS = {
     'CARTA_PRESENTACION': 'Carta de Presentación',
@@ -8,6 +6,8 @@ const MAPA_CARTAS = {
 
 document.addEventListener('DOMContentLoaded', () => {
     renderUniversalHeader('operative');
+    volverAtras();
+    
     InicializarSeccionRevision({
         statusSeccion: 'CARTAS',
         mapaNombres: MAPA_CARTAS,

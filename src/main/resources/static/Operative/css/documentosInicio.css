@@ -24,21 +24,6 @@ body {
 }
 
 /* --- BARRA DE NAVEGACIÓN (STICKY FIX) --- */
-.nav-bar {
-    background: var(--white);
-    padding: 0.75rem 3rem;
-    border-bottom: 1px solid var(--border);
-    position: sticky;
-    top: 96px;
-    z-index: 990;
-    box-shadow: 0 2px 5px rgba(0,0,0,0.05);
-    transition: top 0.2s;
-}
-
-.back-link {
-    text-decoration: none; color: var(--primary-dark); font-weight: 700; font-size: 0.9rem;
-    display: flex; align-items: center; gap: 0.5rem;
-}
 
 /*Ir a  cartas*/
 .irCartas{

@@ -1,5 +1,3 @@
-const urlParams = new URLSearchParams(window.location.search);
-const enrollment = urlParams.get('enrollment');
 
 
 const MAPA_DOCS_INICIALES = {
@@ -12,6 +10,7 @@ const MAPA_DOCS_INICIALES = {
 
 document.addEventListener('DOMContentLoaded', () => {
     renderUniversalHeader('operative');
+    volverAtras();
     InicializarSeccionRevision({
         statusSeccion: 'DOC_INICIAL',
         mapaNombres: MAPA_DOCS_INICIALES,
