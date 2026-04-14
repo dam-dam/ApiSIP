@@ -1,9 +1,7 @@
 const urlParams = new URLSearchParams(window.location.search);
 const enrollment = urlParams.get('enrollment');
-const API_SAVE_DOC = `/documents/review`; //post
-const DOC_PATH = '/view-documents/';
 
-let currentDocuments = [];
+
 const MAPA_DOCS_INICIALES = {
     'CEDULA_REGISTRO': 'Cedula de Registro',
     'CONSTANCIA_IMSS': 'IMSS',

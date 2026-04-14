@@ -1,68 +1,37 @@
 const urlParams = new URLSearchParams(window.location.search);
 const enrollment = urlParams.get('enrollment');
+
+// Mapa para que los nombres se vean bonitos (puedes agregar más si quieres)
+const MAPA_DOCS_CARTAS = {
+    'CARTA_PRESENTACION': 'Carta de Presentación',
+    'CARTA_ACEPTACION': 'Carta de Aceptación'
+};
+
 document.addEventListener('DOMContentLoaded', async () => {
-    // 1. Validaciones iniciales
+    // 1. Validaciones de boleta
     if (!enrollment) {
         alert("No se especificó la boleta del alumno.");
         window.location.href = 'home.html';
         return;
     }
 
+    // 2. Renderizamos el encabezado azul
     renderUniversalHeader('operative');
 
-    const data = await SeccionInfoEstudiante(enrollment, 'CARTAS'); 
-    if (data && data.documents) {
-        renderCartas(data); 
-    } else {
-        console.error("No se recibieron documentos del API");
-    }
-    renderUniversalFooter();
-});
-
-function renderCartas(data) {
-    const container = document.getElementById('docs-list');
-    if (!container || !data.documents) return;
-
-    container.innerHTML = ''; 
-    const fragment = document.createDocumentFragment();
-
-    // Ahora iteramos sobre lo que realmente viene del API
-    data.documents.forEach((doc, index) => {
-        const opciones = {
-            index: index,
-            // Si el status es 'SIN_CARGA', habilitamos el modo subida
-            isUploadMode: doc.status === 'SIN_CARGA', 
-            labelPersonalizado: doc.typeCode.replace(/_/g, ' '), // Quita guiones bajos
-            onUpload: (event) => manejarSubidaArchivo(event, doc.typeCode)
-        };
-
-        const tarjeta = TarjetaOperador(doc, opciones);
-        fragment.appendChild(tarjeta);
+    // 3. Inicializamos con la lógica genérica
+    InicializarSeccionRevision({
+        statusSeccion: 'CARTAS',
+        enrollment: enrollment,
+        mapaNombres: MAPA_DOCS_CARTAS,
+        // Usamos la misma función que ya te funcionaba para traer la data
+        endpointGet: async () => {
+            const data = await SeccionInfoEstudiante(enrollment, 'CARTAS');
+            // IMPORTANTE: El componente espera un ARRAY, así que le pasamos solo los documentos
+            return data && data.documents ? data.documents : [];
+        },
+        endpointPost: '/documents/review',
+        containerId: 'docs-list' // Asegúrate de que este ID sea el de tu HTML
     });
 
-    container.appendChild(fragment);
-}
-
-function manejarSubidaArchivo(e) {
-    const archivo = e.target.files[0];
-    const visor = document.getElementById('visor-pdf-operador');
-    const botonPublicar = document.getElementById('btn-subir-carta');
-    const labelNombre = document.querySelector('.file-name-display'); // O el ID que uses en tu componente
-
-    if (archivo && archivo.type === 'application/pdf') {
-        // Validar tamaño 1MB
-        if (archivo.size > 1024 * 1024) {
-            showModal('Error', 'El archivo supera 1MB', 'error');
-            e.target.value = ''; // Limpiamos el input
-            return;
-        }
-
-        if (labelNombre) labelNombre.textContent = archivo.name;
-        if (botonPublicar) botonPublicar.disabled = false;
-
-        // Mostrar vista previa
-        mostrarVistaPrevia(archivo, visor);
-    } else {
-        showModal('Error', 'Por favor selecciona un archivo PDF válido', 'warning');
-    }
-}
+    renderUniversalFooter();
+});
