@@ -75,9 +75,7 @@ public class DocumentService {
         } else {
             createNewDocument(process, type, file);
         }
-        if(process.getProcessStatus().getId() != 2){
-            processService.updateStatus(process);
-        }
+        if (process.getProcessStatus().getId() == 1) processService.updateStatus(process);
     }
 
     @Transactional(readOnly = true)
