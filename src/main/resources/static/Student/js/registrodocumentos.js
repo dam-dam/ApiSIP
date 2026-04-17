@@ -96,7 +96,7 @@ function updateCard(id, data) {
     const labelBtn = document.getElementById(`btn-${id}`);
     const dateEl = document.getElementById(`date-${id}`);
 
-    card.className = "doc-card"; // Reset
+    card.className = "doc-card";
     let statusCls = "status-none", badgeCls = "badge-none", label = "Sin Cargar";
 
     // Mapeo de estados del backend
@@ -164,7 +164,7 @@ async function handleGlobalUpload() {
     btn.disabled = true;
     btn.textContent = "Subiendo documentos...";
 
-    // 2. Enviamos uno por uno (como le gusta al Back actual)
+    // 2. Enviamos uno por uno 
     for (const item of inputsConArchivos) {
         const formData = new FormData();
         formData.append('file', item.input.files[0]);
@@ -181,7 +181,6 @@ async function handleGlobalUpload() {
             if (response.ok) {
                 filesSent++;
             } else {
-                // Si uno falla, capturamos el error pero seguimos con los demás
                 const errorMsg = await response.text();
                 console.error(`Error en ${item.config.label}: ${errorMsg}`);
             }
