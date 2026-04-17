@@ -8,7 +8,7 @@ document.addEventListener('DOMContentLoaded', () => {
 async function loadProfileData() {
     try {
         // Consumo de la API real
-        const resp = await fetch('/users/profile');
+        const resp = await fetch('/users/data');
 
         if (resp.ok) {
             const data = await resp.json();

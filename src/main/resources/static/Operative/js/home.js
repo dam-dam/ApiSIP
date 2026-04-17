@@ -37,12 +37,12 @@ async function fetchCareers() {
             container.querySelector('.active').classList.remove('active');
             item.classList.add('active');
 
-            selectedCareer = item.dataset.acronym; // Guardamos la carrera elegida
-            selectedPlan = 'all'; // Siempre reseteamos el plan a 'all' al cambiar de carrera
+            selectedCareer = item.dataset.acronym; 
+            selectedPlan = 'all'; 
 
-            await fetchSyllabus(); // Esto cargará los planes de ESA carrera
-            await renderTable();   // ¡ESTO es lo que actualiza los mil registros con el filtro!
-            await fetchStats();    // Para que los numeritos de arriba también se filtren
+            await fetchSyllabus();
+            await renderTable();   
+            await fetchStats();  
         };
     });
 }
@@ -68,8 +68,8 @@ async function fetchSyllabus() {
             item.classList.add('active');
             selectedPlan = item.dataset.code;
 
-            await renderTable(); // Actualizamos la tabla con el nuevo plan
-            await fetchStats();  // Actualizamos contadores
+            await renderTable(); 
+            await fetchStats(); 
         };
     });
 }
@@ -133,7 +133,7 @@ async function renderTable() {
                 <td><strong>${s.syllabusCode || 'N/A'}</strong></td>
                 <td>${s.name} ${s.fLastName} ${s.mLastName}</td>
                 <td>${s.enrollment}</td>
-                <td><span class="visual-status">En Proceso</span></td>
+                <td><span class="visual-status">${s.processStatus || 'N/A'}</span></td>
             </tr>
         `).join('');
     } catch (e) { console.error("Error:", e); }

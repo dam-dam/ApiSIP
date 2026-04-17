@@ -22,7 +22,7 @@
         overflow: hidden;
         box-shadow: 0 4px 6px rgba(0,0,0,0.03);
         transition: all 0.3s ease;
-        border-left: 6px solid var(--gray); /* Inicial: Gris */
+        border-left: 6px solid var(--gray);
 }
 
 .doc-header {

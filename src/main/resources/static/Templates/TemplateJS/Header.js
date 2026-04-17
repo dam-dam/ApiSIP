@@ -12,9 +12,6 @@ async function renderUniversalHeader(tipoUsuario = 'students') {
     const headerElement = document.querySelector('header');
     if (!headerElement) return;
 
-    // 1. Insertar el HTML base
-    // ui-components.js (dentro de tu función de renderUniversalHeader)
-
     headerElement.innerHTML = `
     <div class="logo-group">
         <div class="school-logo">
@@ -48,17 +45,7 @@ async function renderUniversalHeader(tipoUsuario = 'students') {
 
     
 `;
-
-/*
-<div class="logo-group">
-        <img src="../Imagenes/ipn.png" alt="IPN" class="logo-img">
-        <img src="../Imagenes/logo blanco.png" alt="UPIICSA" class="logo-img">
-</div>
-*/
-    // 2. Configurar Eventos
     setupHeaderEvents(tipoUsuario);
-
-    // 3. Cargar datos del perfil
     loadHeaderProfile(tipoUsuario);
 }
 
@@ -92,15 +79,18 @@ async function  loadHeaderProfile(tipoUsuario) {
         const resp = await fetch(endpoint);
         if (resp.ok) {
             const data = await resp.json();
-            // Tomamos el primer nombre y primer apellido
             const firstName = data.name.split(' ')[0];
             const lastName = data.fLastName ? data.fLastName.split(' ')[0] : "";
 
             const nameEl = document.getElementById('user-pill-name');
             const initialEl = document.getElementById('user-pill-initial');
 
+            //const statusParaMostrar = localStorage.getItem('currentProcessStatus') || data.infoInstitutional.processStatus;
+
             if (nameEl) nameEl.textContent = `${firstName} ${lastName}`;
             if (initialEl) initialEl.textContent = firstName.charAt(0).toUpperCase();
+
+            console.log("Status en Header:", statusParaMostrar);
         }
     } catch (error) {
         console.error("Error al cargar perfil en el header:", error);

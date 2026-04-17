@@ -2,16 +2,16 @@ const API_OPERADOR_UPLOAD = '/documents/uploadLetter';
 const DOC_PATH = '/view-documents/'; 
 
 const DOC_CONFIG = [
-    { id: 'CP', label: 'Carta de Presentación', typeCode: 'CARTA_PRESENTACION' }
+    { id: 'CP', label: 'Carta de Presentación', typeCode: 'CARTA_PRESENTACION' },
     
 ];
 const MAPA_DOCS_INICIALES = {
+    'CARTA_PRESENTACION': 'Carta de Presentación',
     'CARTA_ACEPTACION': 'Carta de Aceptación',
 };
 document.addEventListener('DOMContentLoaded', () => {
     renderUniversalHeader('users');
     volverAtras();
-    initOperadorCartas();
      InicializarSeccionRevision({
         statusSeccion: 'CARTAS',
         mapaNombres: MAPA_DOCS_INICIALES,
@@ -50,23 +50,6 @@ function verificarAccesoTermino(documentos, idBotonContenedor) {
     }
 }
 
-
-async function initOperadorCartas() {
-    const urlParams = new URLSearchParams(window.location.search);
-    const enrollment = urlParams.get('enrollment');
-    
-    if (!enrollment) return;
-
-    const container = document.getElementById('docs-container');
-    const data = await obtenerEstadoAlumno(enrollment);
-    const cartaData = data.documents.find(d => d.typeCode === 'CARTA_PRESENTACION') || {};
-
-    container.innerHTML = DOC_CONFIG.map(doc => {
-        return crearTarjetaDocumento(doc, cartaData, "", false);
-    }).join('');
-
-    setupUploadListener(enrollment);
-}
 
 function setupUploadListener(enrollment) {
     const input = document.getElementById('file-CP');

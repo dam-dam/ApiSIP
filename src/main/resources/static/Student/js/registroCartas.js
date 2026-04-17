@@ -1,133 +1,189 @@
 const API_GET_STATUS = '/documents/my-status'; //get
-const API_DOWNLOAD_LETTER = '/documents/downloadLetter'; // El nuevo endpoint POST
+const API_POST_UPLOAD = '/documents/upload';//post
 const DOC_PATH = '/view-documents/'; //post
 
+// Mapeo exacto según tu catálogo de backend
+const DOC_CONFIG = [
+    { id: 'cp', label: 'Carta de Presentación', typeCode: 'CARTA_PRESENTACION' },
+    { id: 'ca', label: 'Carta de Aceptación', typeCode: 'CARTA_ACEPTACION' }
+];
 
-document.addEventListener('DOMContentLoaded', async () => {
-    // 1. Renderizamos los componentes visuales comunes
+document.addEventListener('DOMContentLoaded', () => {
     renderUniversalHeader('students');
     volverAtras(); 
     tituloFijo(
         "Cartas de Presentación y Aceptación",
-        "Por favor, descarga tu carta de presentación y carga tu carta de aceptación en formato PDF."
+        "Por favor, carga tus archivos en formato PDF. Peso no mayor a 1MB."
     );
+    initUI();
+    loadStatus();
     renderUniversalFooter();
-
-    // 2. ¡Llamamos a tu función de carga de datos!
-    await cargarCartasAlumno();
+    const btnGuardar = document.getElementById('btn-global-save');
+    if (btnGuardar) {
+        btnGuardar.addEventListener('click', handleGlobalUpload);
+    }
 });
 
+function initUI(docsData = []) {
+    const container = document.getElementById('docs-container');
 
+    container.innerHTML = DOC_CONFIG.map(doc => {
+        // CORRECCIÓN: Buscamos por typeCode, que es lo que viene del backend
+        const dataDoc = docsData.find(d => d.typeCode === doc.typeCode) || {};
+        
+        // La función crearTarjetaDocumento ya tiene la lógica que hicimos 
+        // para ocultar observaciones y mostrar descarga si es CARTA_PRESENTACION
+        return crearTarjetaDocumento(doc, dataDoc); 
+    }).join('');
 
-// Esta función es la que alimentará a cargarCartasAlumno
-async function obtenerEstadoAlumno() {
-    try {
-        const response = await fetch(API_DOWNLOAD_LETTER, {
-            method: 'GET',
-            headers: {
-                'Content-Type': 'application/json',
-                // A veces es necesario enviar un objeto vacío si el POST no lleva parámetros
-            },
-            body: JSON.stringify({}) 
-        });
-
-        if (response.status === 404) {
-            // Si sigue saliendo 404, intenta cambiar la ruta a '/ApiSIP/documents/downloadLetter' 
-            // o como se llame tu proyecto en el server
-            console.error("Ruta no encontrada (404)");
-            return null;
+    // Re-activar los listeners de archivos
+    DOC_CONFIG.forEach(doc => {
+        const input = document.getElementById(`file-${doc.id}`);
+        if(input) {
+            input.addEventListener('change', (e) => {
+                if (e.target.files.length > 0) {
+                    document.getElementById(`name-${doc.id}`).textContent = e.target.files[0].name;
+                }
+            });
         }
+    });
+}
+async function loadStatus() {
+    try {
+        const urlCompleta = API_GET_STATUS + "?processStatus=CARTAS";
+        const resp = await fetch(urlCompleta);
 
-        if (!response.ok) return null;
+        if (resp.ok) {
+            const data = await resp.json();
+            console.log("Datos recibidos:", data);
 
-        return await response.json(); 
-    } catch (error) {
-        console.error("Error al obtener la carta del operador:", error);
-        return null;
+            // 1. Redibujamos la UI con los datos frescos para que se aplique 
+            // la lógica de "Solo descargar" o "Subir"
+            initUI(data);
+
+            // 2. Mantenemos el updateCard por si necesitas actualizar estados visuales extra
+            data.forEach(item => {
+                const config = DOC_CONFIG.find(c => c.typeCode === item.typeCode);
+                if (config) updateCard(config.id, item);
+            });
+        }
+    } catch (e) {
+        console.error("Error cargando estatus:", e);
     }
 }
 
-// 2. LA FUNCIÓN QUE TE MARCABA ERROR POR NO ESTAR DEFINIDA
-function setupUploadListenerAlumno(id, typeCode) {
+function updateCard(id, data) {
+    const card = document.getElementById(`card-${id}`);
+    const badge = document.getElementById(`badge-${id}`);
+    const comment = document.getElementById(`comment-${id}`);
+    const display = document.getElementById(`name-${id}`);
     const input = document.getElementById(`file-${id}`);
-    const label = document.getElementById(`name-${id}`);
+    const labelBtn = document.getElementById(`btn-${id}`);
+    const dateEl = document.getElementById(`date-${id}`);
 
-    if (input) {
-        input.addEventListener('change', async (e) => {
-            if (e.target.files.length > 0) {
-                const file = e.target.files[0];
-                if (label) label.textContent = "Seleccionado: " + file.name;
-                
-                // Aquí llamarías a tu función de subir (upload)
-                console.log("Subiendo archivo para:", typeCode);
-                await manejarSubidaAlumno(file, typeCode);
-            }
-        });
+    card.className = "doc-card";
+    let statusCls = "status-none", badgeCls = "badge-none", label = "Sin Cargar";
+
+    // Mapeo de estados del backend
+    if (data.status === "CORRECTO") {
+        statusCls = "status-correct"; badgeCls = "badge-correct"; label = "Aceptado";
+        input.disabled = true;
+        labelBtn.style.opacity = "0.5";
+        labelBtn.style.pointerEvents = "none";
+    } else if (data.status === "INCORRECTO") {
+        statusCls = "status-incorrect"; badgeCls = "badge-incorrect"; label = "Rechazado";
+    } else if (data.status === "PENDIENTE") {
+        statusCls = "status-pending"; badgeCls = "badge-pending"; label = "En Revisión";
+    } else if (data.fileName) {
+        statusCls = "status-pending"; badgeCls = "badge-pending"; label = "Pendiente";
     }
-}
 
-// 3. Función para manejar la subida (Para la Carta de Aceptación)
-async function manejarSubidaAlumno(file, typeCode) {
-    const formData = new FormData();
-    formData.append('file', file);
-    formData.append('type', typeCode);
+    card.classList.add(statusCls);
+    badge.textContent = label;
+    badge.className = `status-badge ${badgeCls}`;
+    comment.textContent = data.comment || "Sin observaciones.";
 
-    try {
-        const response = await fetch('/documents/upload', {
-            method: 'POST',
-            body: formData
-        });
-
-        if (response.ok) {
-            alert("Archivo subido correctamente");
-            location.reload();
-        } else {
-            alert("Error al subir el archivo");
+    if (data.fileName) {
+        // Lógica para la fecha
+        let dateStr = '(--/--/---- --:--)';
+        if (data.uploadDate) {
+            const dateObj = new Date(data.uploadDate);
+            dateStr = dateObj.toLocaleDateString('es-MX', {
+                day: '2-digit',
+                month: '2-digit',
+                year: 'numeric',
+                hour: '2-digit',
+                minute:'2-digit'
+            }).replace(',', '');
         }
-    } catch (error) {
-        console.error("Error en la subida:", error);
+        // Actualizar la fecha en el header
+        if(dateEl) dateEl.textContent = dateStr;
+         // Actualizar solo el nombre del archivo con su enlace e icono
+        display.innerHTML = `
+            <a href="${DOC_PATH}${data.fileName}" target="_blank" class="file-link view-document-btn">
+                <i class="fa-solid fa-eye"></i> Ver documento
+            </a>
+        `;
     }
 }
 
-async function cargarCartasAlumno() {
-    const container = document.getElementById('docs-container');
-    if (!container) return;
+/**
+ * Procesa la subida de múltiples archivos
+ */ 
+async function handleGlobalUpload() {
+    const btn = document.getElementById('btn-global-save');
+    let filesSent = 0;
+    const textoOriginal = btn.textContent;
 
-    // 1. Obtenemos la Carta de Presentación (la que manda el operador)
-    const cartaPresentacion = await obtenerEstadoAlumno(); 
-
-    container.innerHTML = ""; 
-
-    // 2. Si existe la carta, la mostramos con tu diseño de éxito
-    if (cartaPresentacion) {
-        const tarjetaCP = TarjetaDocumentoAlumno(cartaPresentacion, { 
-            index: 'CP',
-            docPath: DOC_PATH 
-        });
-        container.appendChild(tarjetaCP);
-    }
-
-    // 3. Ahora cargamos la Carta de Aceptación (que el alumno debe subir)
-    // Para esta usamos el otro endpoint que ya tenías: /my-status?processStatus=CARTAS
-    await cargarCartaAceptacionPersonalizada();
-}
-
-async function cargarCartaAceptacionPersonalizada() {
-    const container = document.getElementById('docs-container');
-    
-    // Llamamos al GET /my-status que devuelve la LISTA de documentos del alumno
-    const resp = await fetch('/documents/my-status?processStatus=CARTAS');
-    const docs = await resp.json();
-
-    const dataCA = docs.find(d => d.typeCode === 'CARTA_ACEPTACION') || {};
-
-    const htmlCA = crearTarjetaDocumento(
-        { id: 'CA', label: 'Carta de Aceptación', typeCode: 'CARTA_ACEPTACION' }, 
-        dataCA, 
-        "", 
-        true
+    // 1. Obtener solo los inputs que SÍ tienen archivos
+    const inputsConArchivos = DOC_CONFIG.map(config => ({
+        config,
+        input: document.getElementById(`file-${config.id}`)
+    })).filter(item => 
+        item.config.typeCode !== 'CARTA_PRESENTACION' && // NO intentar subir la de presentación
+        item.input && 
+        item.input.files.length > 0
     );
-    
-    container.insertAdjacentHTML('beforeend', htmlCA);
-    setupUploadListenerAlumno('CA', 'CARTA_ACEPTACION');
-}
+
+    if (inputsConArchivos.length === 0) {
+        showModal('Sin cambios', 'No has seleccionado archivos nuevos.', 'warning');
+        return;
+    }
+
+    btn.disabled = true;
+    btn.textContent = "Subiendo documentos...";
+
+    // 2. Enviamos uno por uno 
+    for (const item of inputsConArchivos) {
+        const formData = new FormData();
+        formData.append('file', item.input.files[0]);
+        formData.append('type', item.config.typeCode);
+
+        try {
+            console.log(`Subiendo ${item.config.label} a la ruta de servidor...`);
+            
+            const response = await fetch(API_POST_UPLOAD, {
+                method: 'POST',
+                body: formData
+            });
+
+            if (response.ok) {
+                filesSent++;
+            } else {
+                const errorMsg = await response.text();
+                console.error(`Error en ${item.config.label}: ${errorMsg}`);
+            }
+        } catch (e) {
+            console.error(`Error de conexión en ${item.config.label}:`, e);
+        }
+    }
+
+    // 3. Resultado final
+    if (filesSent > 0) {
+        showModal('¡Éxito!', `Se guardaron ${filesSent} archivo(s) en el servidor.`, 'success', () => location.reload());
+    } else {
+        showModal('Error', 'No se pudo subir ningún archivo. Revisa la consola.', 'error');
+        btn.disabled = false;
+        btn.textContent = textoOriginal;
+    }
+} 

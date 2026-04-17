@@ -52,6 +52,7 @@ function renderProgress(apiData, docsData, docsCarts, docsTermino) {
     const haSubidoAlgoCarts = docsCarts && docsCartsFase2.some(doc => doc.fileName !== null && doc.status !== 'SIN_CARGA');
     const haSubidoAlgoTermino = docsTermino && docsTerminoFase3.some(doc => doc.fileName !== null && doc.status !== 'SIN_CARGA');
 
+    let nuevoStatusCalculado = "DOC_INICIAL";
     // ===================== Aprobado
     const todoAprobadoReal = docsObligatorios.every(type => {
         const doc = docsData.find(d => d.typeCode === type);
@@ -186,6 +187,16 @@ function renderProgress(apiData, docsData, docsCarts, docsTermino) {
         `;
     }).join('');
 
+    if (todoAprobadoRealTermino) {
+        nuevoStatusCalculado = 'LIBERACION';
+    } else if (todoAprobadoRealCarts) {
+        nuevoStatusCalculado = 'DOC_FINAL';
+    } else if (todoAprobadoReal) {
+        nuevoStatusCalculado = 'CARTAS';
+    }
+
+    // Guardamos este valor para que el Header lo pueda ver sin consultar al servidor de nuevo
+    localStorage.setItem('currentProcessStatus', nuevoStatusCalculado);
     actualizarTarjetas(todoAprobadoReal, todoAprobadoRealCarts, todoAprobadoRealTermino);
     console.log(todoAprobadoReal);
     console.log(todoAprobadoRealCarts);
