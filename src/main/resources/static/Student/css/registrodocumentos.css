@@ -24,7 +24,6 @@
         flex-direction: column;
         min-height: 100vh;
     }
-    /* --- NAVEGACIÓN STICKY --- */
     
     /* --- CONTENIDO --- */
     .container {
@@ -40,12 +39,7 @@
         justify-content: flex-start;
     }
     
-
-    /* --- TARJETAS DE DOCUMENTOS --- */
-   
-    /* Zona de Carga */
     
-    /* Footer de Acción */
     .sticky-action-bar {
         margin-top: 2rem;
         display: flex;

@@ -2,7 +2,7 @@
     --primary: #1A8C14;
     --primary-dark: #136b10;
     --primary-light: #e8f5e9;
-    --bg: #f0f2f0; /* Fondo con tinte verde muy sutil */
+    --bg: #f0f2f0; 
     --text-main: #1f2937;
     --text-muted: #6b7280;
     --white: #ffffff;
@@ -41,13 +41,13 @@ body {
     font-size: 0.9rem;
     text-transform: uppercase;
     letter-spacing: 0.15em;
-    color: var(--primary-dark); /* Títulos en verde */
+    color: var(--primary-dark);
     font-weight: 800;
 }
 
 .section-header .line { flex: 1; height: 3px; background: var(--primary-light); border-radius: 2px; }
 
-/* --- TARJETAS RECTANGULARES --- */
+
 .card-grid {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
@@ -76,7 +76,7 @@ body {
 
 .icon-box {
     width: 52px; height: 52px;
-    background: var(--primary); /* Iconos con fondo verde */
+    background: var(--primary); 
     border-radius: 1rem;
     display: flex; align-items: center; justify-content: center;
     flex-shrink: 0;

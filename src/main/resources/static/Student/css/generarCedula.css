@@ -20,10 +20,6 @@ body {
     min-height: 100vh;
 }
 
-
-/* --- NAVEGACIÓN STICKY --- */
-
-/* --- CONTENIDO ESPECÍFICO DE GENERAR CÉDULA --- */
 .container {
     max-width: 1300px;
     width: 95%;
@@ -34,7 +30,6 @@ body {
     gap: 2rem;
 }
 
-/* --- LADO IZQUIERDO: FORMULARIO --- */
 .form-side {
     display: flex;
     flex-direction: column;

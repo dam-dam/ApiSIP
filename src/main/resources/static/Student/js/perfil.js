@@ -6,7 +6,7 @@ document.addEventListener('DOMContentLoaded', () => {
     renderUniversalFooter();
 });
 
-// Cargar datos desde la API
+
 async function loadUserProfile() {
     try {
         const resp = await fetch('/students/data');
@@ -64,7 +64,7 @@ function setupPasswordUpdate() {
         btnUpdate.textContent = "Actualizando...";
 
         try {
-            // NOTA: Asegúrate de tener implementado el endpoint /student/change-password en tu StudentController
+            
             const resp = await fetch('/student/change-password', {
                 method: 'POST', // o PUT
                 headers: { 'Content-Type': 'application/json' },

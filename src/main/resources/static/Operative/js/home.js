@@ -22,7 +22,7 @@ async function init() {
 
 function setupListeners() {
     document.getElementById('searchInput').addEventListener('input', debounce(() => {
-        currentPage = 0; // Resetear página al buscar
+        currentPage = 0; 
         renderTable();
     }, 300));
 }
@@ -42,7 +42,7 @@ async function fetchCareers() {
 
             selectedCareer = item.dataset.acronym;
             selectedPlan = 'all';
-            currentPage = 0; // Resetear página
+            currentPage = 0;
 
             await fetchSyllabus();
             await renderTable();
@@ -140,12 +140,12 @@ async function renderTable() {
             </tr>
         `).join('');
 
-        // Cálculo de leyenda basado en el objeto "page" que manda Spring
+       
         const p = data.page;
         const start = (p.number * p.size) + 1;
         const end = (p.number * p.size) + students.length;
 
-        // isFirst y isLast para las flechas
+        
         const isFirst = p.number === 0;
         const isLast = p.number >= p.totalPages - 1;
 

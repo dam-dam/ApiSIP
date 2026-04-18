@@ -2,7 +2,7 @@ const API_GET_STATUS = '/documents/my-status'; //get
 const API_POST_UPLOAD = '/documents/upload';//post
 const DOC_PATH = '/view-documents/'; //post
 
-// Mapeo exacto según tu catálogo de backend
+
 const DOC_CONFIG = [
     { id: 'HA', label: 'Hojas de Asistencia', typeCode: 'HOJAS_ASISTENCIA' },
     { id: 'IM', label: 'Informes Mensuales', typeCode: 'INFORMES_MENSUALES' },
@@ -33,7 +33,7 @@ function initUI(docsData = []) {
         const dataDoc = docsData.find(d => d.typeCode === doc.id) || {};
         const estaAprobado = dataDoc.status === 'CORRECTO';
 
-        // Definimos la acción especial solo para la cédula
+        
         let accionEspecial = "";
         if (doc.id === 'cedula' && !estaAprobado) {
             accionEspecial = `
@@ -45,7 +45,7 @@ function initUI(docsData = []) {
         return crearTarjetaDocumento(doc, dataDoc, accionEspecial);
     }).join('');
 
-    // Re-activar los listeners de archivos
+   
     DOC_CONFIG.forEach(doc => {
         const input = document.getElementById(`file-${doc.id}`);
         if(input) {
@@ -95,10 +95,10 @@ function updateCard(id, data) {
     const labelBtn = document.getElementById(`btn-${id}`);
     const dateEl = document.getElementById(`date-${id}`);
 
-    card.className = "doc-card"; // Reset
+    card.className = "doc-card"; 
     let statusCls = "status-none", badgeCls = "badge-none", label = "Sin Cargar";
 
-    // Mapeo de estados del backend
+   
     if (data.status === "CORRECTO") {
         statusCls = "status-correct"; badgeCls = "badge-correct"; label = "Aceptado";
         input.disabled = true;
@@ -130,9 +130,9 @@ function updateCard(id, data) {
                 minute:'2-digit'
             }).replace(',', '');
         }
-        // Actualizar la fecha en el header
+        
         if(dateEl) dateEl.textContent = dateStr;
-         // Actualizar solo el nombre del archivo con su enlace e icono
+        
         display.innerHTML = `
             <a href="${DOC_PATH}${data.fileName}" target="_blank" class="file-link view-document-btn">
                 <i class="fa-solid fa-eye"></i> Ver documento
@@ -149,7 +149,7 @@ async function handleGlobalUpload() {
     let filesSent = 0;
     const textoOriginal = btn.textContent;
 
-    // 1. Obtener solo los inputs que SÍ tienen archivos
+   
     const inputsConArchivos = DOC_CONFIG.map(config => ({
         config,
         input: document.getElementById(`file-${config.id}`)
@@ -163,7 +163,7 @@ async function handleGlobalUpload() {
     btn.disabled = true;
     btn.textContent = "Subiendo documentos...";
 
-    // 2. Enviamos uno por uno (como le gusta al Back actual)
+   
     for (const item of inputsConArchivos) {
         const formData = new FormData();
         formData.append('file', item.input.files[0]);
@@ -180,7 +180,7 @@ async function handleGlobalUpload() {
             if (response.ok) {
                 filesSent++;
             } else {
-                // Si uno falla, capturamos el error pero seguimos con los demás
+               
                 const errorMsg = await response.text();
                 console.error(`Error en ${item.config.label}: ${errorMsg}`);
             }
@@ -189,7 +189,7 @@ async function handleGlobalUpload() {
         }
     }
 
-    // 3. Resultado final
+   
     if (filesSent > 0) {
         showModal('¡Éxito!', `Se guardaron ${filesSent} archivo(s) en el servidor.`, 'success', () => location.reload());
     } else {

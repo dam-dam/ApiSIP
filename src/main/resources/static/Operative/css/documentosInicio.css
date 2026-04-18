@@ -23,11 +23,7 @@ body {
     min-height: 100vh;
 }
 
-/* --- BARRA DE NAVEGACIÓN (STICKY FIX) --- */
 
-/*Ir a  cartas*/
-
-/* --- LAYOUT 50/50 --- */
 .container {
     max-width: 1600px;
     width: 98%;

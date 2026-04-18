@@ -21,10 +21,6 @@ body {
     flex-direction: column;
     min-height: 100vh;
 }
-
-/* --- HEADER ESTANDARIZADO --- */
-
-/* --- BARRA DE NAVEGACIÓN (STICKY) --- */
 .nav-bar {
     background: var(--white);
     padding: 0.75rem 3rem;

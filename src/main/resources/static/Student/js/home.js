@@ -195,28 +195,27 @@ function renderProgress(apiData, docsData, docsCarts, docsTermino) {
         nuevoStatusCalculado = 'CARTAS';
     }
 
-    // Guardamos este valor para que el Header lo pueda ver sin consultar al servidor de nuevo
     localStorage.setItem('currentProcessStatus', nuevoStatusCalculado);
     actualizarTarjetas(todoAprobadoReal, todoAprobadoRealCarts, todoAprobadoRealTermino);
     console.log(todoAprobadoReal);
     console.log(todoAprobadoRealCarts);
     console.log(todoAprobadoRealTermino);
 }
-//funcion paraa abrir cartar y cartas progreso
+
 function actualizarTarjetas(docsInicialesOK, cartasOK, terminoOK) {
     const configuracion = [
         {
             id: 'card-cartas',
             link: 'registroCartas.html',
             tag: 'lock-tag-cartas',
-            puedeAbrir: docsInicialesOK, //solo si docs iniciales estan aprobados
+            puedeAbrir: docsInicialesOK,
             mensaje: "Primero deben aceptar todos tus Documentos Iniciales."
         },
         {
             id: 'card-seguimiento',
             link: 'registroseguimiento.html',
             tag: 'lock-tag-seguimiento',
-            puedeAbrir: cartasOK, // Solo si las cartas están aprobadas
+            puedeAbrir: cartasOK, 
             mensaje: "Primero deben Aceptar tus Cartas."
         }
     ];

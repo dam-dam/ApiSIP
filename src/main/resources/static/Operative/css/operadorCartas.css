@@ -24,10 +24,6 @@ body {
     flex-direction: column;
     min-height: 100vh;
 }
-
-/* --- NAVEGACIÓN STICKY --- */
-
-/* --- CONTENIDO --- */
 .container {
      max-width: 1600px;
     width: 98%;
@@ -41,7 +37,6 @@ body {
 
 .review-panel { display: flex; flex-direction: column; gap: 1.2rem; }
 
-/* --- VISOR PDF --- */
 
 @media (max-width: 1200px) { 
     .container { 

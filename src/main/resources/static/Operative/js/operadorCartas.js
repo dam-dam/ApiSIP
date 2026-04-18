@@ -87,6 +87,7 @@ async function subirCartaPresentacion(enrollment, file) {
         console.error("Error:", error);
     }
 }
+
 async function obtenerEstadoAlumno(enrollment) {
     try {
        
@@ -98,6 +99,7 @@ async function obtenerEstadoAlumno(enrollment) {
         return { documents: [] }; 
     }
 }
+
 async function handleGlobalUpload() {
     const urlParams = new URLSearchParams(window.location.search);
     const enrollment = urlParams.get('enrollment'); 

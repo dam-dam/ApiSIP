@@ -4,41 +4,55 @@ const enrollment = urlParams.get('enrollment');
 
 async function InicializarSeccionRevision(config) {
     const {
-        statusSeccion,      // 'DOC_INICIAL', 'CARTAS', 'DOC_FINAL'
-        mapaNombres,        // El diccionario de nombres
-        endpointPost,       // URL para guardar
-        proximaEtapa,       // { idBoton: 'irCartas', functionVerificar: verificarAccesoACartas }
+        statusSeccion,
+        mapaNombres,
+        endpointPost,
+        proximaEtapa,
         contenedorListaId = 'docs-list'
     } = config;
 
-    // Validación de boleta 
     if (!enrollment) {
         alert("No se especificó la boleta del alumno.");
         window.location.href = 'home.html';
         return;
     }
-    try {
-        // Carga de Datos Única
-        const data = await SeccionInfoEstudiante(enrollment, statusSeccion);
 
-        if (data && data.documents) {
-            currentDocuments = data.documents;
+    try {
+        const [dataInicial, dataCartas, dataTermino] = await Promise.all([
+            SeccionInfoEstudiante(enrollment, 'DOC_INICIAL'),
+            SeccionInfoEstudiante(enrollment, 'CARTAS'),
+            SeccionInfoEstudiante(enrollment, 'DOC_FINAL')
+        ]);
+
+        // Decidimos qué mostrar en la lista principal según el statusSeccion que recibimos
+        let dataActual;
+        if (statusSeccion === 'DOC_INICIAL') dataActual = dataInicial;
+        else if (statusSeccion === 'CARTAS') dataActual = dataCartas;
+        else if (statusSeccion === 'DOC_FINAL') dataActual = dataTermino;
+
+        if (dataActual && dataActual.documents) {
+            currentDocuments = dataActual.documents;
             
-            // Renderizado Dinámico
+            // 1. Renderizamos los documentos de la sección actual
             renderDocumentsGenerico(currentDocuments, mapaNombres, contenedorListaId);
             
-            // Verificación de flujo (Si existe botón para la siguiente etapa)
+            // 2. Pasamos el objeto con TODAS las etapas a la navegación
+            // para que pueda validar la cascada (A -> B -> C)
+            gestionarNavegacionRevision(statusSeccion, {
+                inicial: dataInicial.documents || [],
+                cartas: dataCartas.documents || [],
+                termino: dataTermino.documents || []
+            });
+      
             if (proximaEtapa) {
                 proximaEtapa.functionVerificar(currentDocuments, proximaEtapa.idBoton);
             }
         }
 
-        // Configurar botones de guardado (POST)
         setupActionButtonsGenerico(endpointPost);
 
     } catch (error) {
         console.error("Error al inicializar la sección:", error);
-        
     }
 }
 
@@ -92,7 +106,6 @@ function setupActionButtonsGenerico(endpoint) {
             const radio = document.querySelector(`input[name="st-${uniqueId}"]:checked`);
             const commentArea = document.getElementById(`comm-${uniqueId}`);
 
-            // Solo si el operador seleccionó una opción, lo agregamos al arreglo
             if (radio) {
                 reviews.push({
                     typeName: doc.typeCode,
@@ -102,7 +115,6 @@ function setupActionButtonsGenerico(endpoint) {
             }
         });
 
-        //Al menos un documento debe estar evaluado
         if (reviews.length === 0) {
             showModal(
                 "Información",

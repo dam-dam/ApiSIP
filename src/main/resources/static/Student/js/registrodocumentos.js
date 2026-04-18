@@ -34,7 +34,7 @@ function initUI(docsData = []) {
         const dataDoc = docsData.find(d => d.typeCode === doc.id) || {};
         const estaAprobado = dataDoc.status === 'CORRECTO';
 
-        // Definimos la acción especial solo para la cédula
+        
         let accionEspecial = "";
         if (doc.id === 'cedula' && !estaAprobado) {
             accionEspecial = `
@@ -46,7 +46,7 @@ function initUI(docsData = []) {
         return crearTarjetaDocumento(doc, dataDoc, accionEspecial);
     }).join('');
 
-    // Re-activar los listeners de archivos
+    
     DOC_CONFIG.forEach(doc => {
         const input = document.getElementById(`file-${doc.id}`);
         if(input) {
@@ -99,7 +99,7 @@ function updateCard(id, data) {
     card.className = "doc-card";
     let statusCls = "status-none", badgeCls = "badge-none", label = "Sin Cargar";
 
-    // Mapeo de estados del backend
+    
     if (data.status === "CORRECTO") {
         statusCls = "status-correct"; badgeCls = "badge-correct"; label = "Aceptado";
         input.disabled = true;
@@ -119,7 +119,7 @@ function updateCard(id, data) {
     comment.textContent = data.comment || "Sin observaciones.";
 
     if (data.fileName) {
-        // Lógica para la fecha
+        
         let dateStr = '(--/--/---- --:--)';
         if (data.uploadDate) {
             const dateObj = new Date(data.uploadDate);
@@ -131,9 +131,9 @@ function updateCard(id, data) {
                 minute:'2-digit'
             }).replace(',', '');
         }
-        // Actualizar la fecha en el header
+       
         if(dateEl) dateEl.textContent = dateStr;
-         // Actualizar solo el nombre del archivo con su enlace e icono
+         
         display.innerHTML = `
             <a href="${DOC_PATH}${data.fileName}" target="_blank" class="file-link view-document-btn">
                 <i class="fa-solid fa-eye"></i> Ver documento
@@ -150,7 +150,7 @@ async function handleGlobalUpload() {
     let filesSent = 0;
     const textoOriginal = btn.textContent;
 
-    // 1. Obtener solo los inputs que SÍ tienen archivos
+   
     const inputsConArchivos = DOC_CONFIG.map(config => ({
         config,
         input: document.getElementById(`file-${config.id}`)
@@ -164,7 +164,7 @@ async function handleGlobalUpload() {
     btn.disabled = true;
     btn.textContent = "Subiendo documentos...";
 
-    // 2. Enviamos uno por uno 
+    
     for (const item of inputsConArchivos) {
         const formData = new FormData();
         formData.append('file', item.input.files[0]);
@@ -189,7 +189,7 @@ async function handleGlobalUpload() {
         }
     }
 
-    // 3. Resultado final
+    
     if (filesSent > 0) {
         showModal('¡Éxito!', `Se guardaron ${filesSent} archivo(s) en el servidor.`, 'success', () => location.reload());
     } else {

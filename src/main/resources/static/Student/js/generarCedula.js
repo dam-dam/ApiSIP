@@ -13,10 +13,6 @@ document.addEventListener('DOMContentLoaded', async () => {
 });
 
 
-
-/**
- * Carga estados. Espera que StateDto tenga {id, name}
- */
 async function loadStates() {
     try {
         const resp = await fetch(API_STATES);
@@ -86,7 +82,6 @@ function setupForm() {
         e.preventDefault();
         let esValido = true;
 
-        // Validamos presencia de elementos
         const requiredFields = [
             'studentStreet', 'studentNumber', 'studentZipCode', 'studentNeighborhood', 'studentStateId',
             'companyName', 'companyEmail', 'companyPhone', 'companyExtension', 'companyFax', 'companySector',
@@ -101,7 +96,6 @@ function setupForm() {
             }
         }
 
-        // Validamos uno por uno
         for(let id of requiredFields) {
             const el = document.getElementById(id);
 
@@ -111,25 +105,18 @@ function setupForm() {
         }
 
         if (!esValido) {
-            /*Swal.fire({
-                title: "Error",
-                text: "Uno o varios campos incorrectos, favor de revisar",
-                icon: "error",
-                confirmButtoText: "Continuar"
-            });*/
             showModal(
                 "Error",
                 "Uno o varios campos incorrectos, favor de revisar",
                 "error"
             );
-            //alert("Por favor, corrige los errores antes de continuar.");
+           
             return;
         }
 
         btn.disabled = true;
         btn.textContent = "Generando...";
 
-        // Payload alineado con los records Java
         const payload = {
             studentAddress: {
                 street: document.getElementById('studentStreet').value,
@@ -179,7 +166,6 @@ function setupForm() {
                     "Tu cedula fue creada correctamente",
                     "success"
                 );
-                //alert("Cédula generada correctamente.");
             } else {
                 const errText = await response.text();
                 showModal(
@@ -187,7 +173,6 @@ function setupForm() {
                     "Error al procesar: " + errText,
                     "error"
                 );
-                //alert("Error al procesar: " + errText);
             }
         } catch (error) {
             showModal(
@@ -197,7 +182,6 @@ function setupForm() {
             );
             console.error("Error:", error);
 
-            //alert("Sin conexión al servidor.");
         } finally {
             btn.disabled = false;
             btn.textContent = "Generar PDF de Cédula";
@@ -213,7 +197,7 @@ async function loadPdfPreview() {
         const response = await fetch(API_VIEW_PDF);
         if (response.ok) {
             const blob = await response.blob();
-            if (blob.size < 500) return; // Filtro de seguridad
+            if (blob.size < 500) return; 
             const url = URL.createObjectURL(blob);
             viewer.innerHTML = `<iframe src="${url}"></iframe>`;
             downloadBtn.href = url;
@@ -227,8 +211,9 @@ const CAMPOS_OPCIONALES = ['companyFax', 'companyExtension'];
 function validarCampo(inputElement) {
 
     if (CAMPOS_OPCIONALES.includes(inputElement.id)) {
-        // Limpiamos errores previos por si acaso y marcamos como válido
+        
         const errorElement = document.getElementById(`error-${inputElement.id}`);
+        
         if (errorElement) errorElement.remove();
         inputElement.classList.remove('input-error');
         return true;

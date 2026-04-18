@@ -15,25 +15,20 @@ document.addEventListener('DOMContentLoaded', () => {
         statusSeccion: 'DOC_INICIAL',
         mapaNombres: MAPA_DOCS_INICIALES,
         endpointPost: '/documents/review',
-        proximaEtapa: { 
-            idBoton: 'irCartas', 
-            functionVerificar: verificarAccesoACartas 
+        onDataLoad:(documentos) => {
+            gestionarNavegacionRevision(seccionActual, documentos);
         }
     });
     renderUniversalFooter();
 });
-function verificarAccesoACartas(documentos, idBotonContenedor) {
+function verificarAccesoA(documentos, idBotonContenedor) {
     const btnContenedor = document.getElementById(idBotonContenedor);
     if (!btnContenedor) return;
-
-    // Verificamos que TODOS los documentos tengan status "CORRECTO"
     const todosListos = documentos.length > 0 && documentos.every(doc => doc.status === 'CORRECTO');
 
     if (todosListos) {
         btnContenedor.classList.add("visible");
         console.log("Acceso habilitado: Todos los documentos están CORRECTOS.");
-        
-        // Configurar el clic del botón para navegar
         const btnReal = btnContenedor.querySelector('button');
         if (btnReal) {
             btnReal.onclick = () => {

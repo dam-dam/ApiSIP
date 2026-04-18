@@ -1,7 +1,9 @@
 
 
 const MAPA_DOCS_INICIALES = {
-    
+    'HOJAS_ASISTENCIA': 'Hojas de Asistencia',
+    'INFORMES_MENSUALES': 'Informes Mensuales',
+    'CARTA_TERMINO': 'Carta de Término',
 };
 
 document.addEventListener('DOMContentLoaded', () => {
