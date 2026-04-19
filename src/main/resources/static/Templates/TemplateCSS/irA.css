@@ -13,7 +13,7 @@
     position: relative;
     height: 3.125rem;
     background: var(--primary-light);
-    color: var(--shadow-brand-logo);
+    color: var(--text-main);
     border: none;
     padding: 0 1.25rem 0 2.5rem; 
     margin-right: 0.3125rem;
@@ -75,7 +75,7 @@
 /* ESTADO ACTIVO: Verde fuerte institucional */
 .nav-btn.active {
     background: var(--primary); 
-    color: var(--white);
+    color: var(--text-main);
 }
 
 .nav-btn.active::after {
@@ -86,19 +86,19 @@
 .nav-btn.locked {
     
     cursor: not-allowed;
-    background: var(--gray); /* Color de fondo gris */
-    color: #bababa;
+    background: var(--locked); /* Color de fondo gris */
+    color: var(--white); /* Texto blanco para contraste */
 }
 
 /* CRÍTICO: Actualiza la punta de la flecha cuando está bloqueado */
 .nav-btn.locked::after {
-    border-left-color: var(--gray);
+    border-left-color: var(--locked); /* Cambia el color de la flecha a gris */
 }
 
 /* Interacción Hover: Solo para botones que no estén bloqueados */
 .nav-btn:not(.locked):hover {
     background: var(--primary);
-    color: var(--white);
+    color: var(--text-main);
 }
 
 .nav-btn:not(.locked):hover::after {

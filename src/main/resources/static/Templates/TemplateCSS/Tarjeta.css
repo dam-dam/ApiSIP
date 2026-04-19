@@ -1,26 +1,11 @@
-
-:root {
-    --primary: #1A8C14;
-    --primary-dark: #136b10;
-    --primary-light: #e8f5e9;
-    --bg: #f4f7f4;
-    --text-main: #1f2937;
-    --text-muted: #6b7280;
-    --white: #ffffff;
-    --border: #d1d5db;
-    /* Estados */
-    --gray: #9ca3af;
-    --pending: #f59e0b;
-    --success: #1A8C14;
-    --error: #b91c1c;
-}
+@import url('../global.css');
 .doc-card {
         background: var(--white);
         border-radius: 1.25rem;
-        border: 1px solid var(--border);
+        border: 1px solid var(--border-color);
         margin-bottom: 1.25rem;
         overflow: hidden;
-        box-shadow: 0 4px 6px rgba(0,0,0,0.03);
+        box-shadow: 0 4px 6px var(--shadow-brand-overlay);
         transition: all 0.3s ease;
         border-left: 6px solid var(--gray);
 }
@@ -30,7 +15,7 @@
         display: flex;
         align-items: center;
         justify-content: space-between;
-        background: #fcfdfc;
+        background: var(--white);
 }
 
 
@@ -76,7 +61,7 @@
 /*boton buscar archivo*/
  .btn-browse {
         background: var(--primary);
-        color: white;
+        color: var(--blanco-blanco);
         padding: 0.7rem 0;
         border-radius: 0.8rem;
         font-weight: 700;
@@ -90,7 +75,7 @@
 /* El ojito y el texto de ver documento */
 .view-document-btn {
     margin-top: 8px;
-    color: #2e7d32;
+    color: var(--primary-dark);
     text-decoration: none;
     font-size: 0.9rem;
     display: flex;
@@ -111,12 +96,12 @@
 
 /*Area de las observaciones*/
 .comment-label { font-size: 0.65rem; font-weight: 800; color: var(--text-muted); text-transform: uppercase; margin-bottom: 0.6rem; display: block; }
-.comment-text { font-size: 0.85rem; line-height: 1.6; color: #4b5563; }
+.comment-text { font-size: 0.85rem; line-height: 1.6; color: var(--text-main); }
 .comment-section {
-    background: #f9fafb;
+    background: var(--white);
     padding: 10px;
     border-radius: 8px;
-    border: 1px solid #f1f5f9;
+    border: 1px solid var(--gray);
 }
 
 /*Generar cedula*/
@@ -125,9 +110,9 @@
         align-items: center;
         justify-content: center;
         gap: 8px;
-        background-color: #e8f5e9;
-        color: #2e7d32;
-        border: 1px solid #c8e6c9;
+        background-color: var(--primary-light);
+        color: var(--back);
+        border: 1px solid var(--primary);
         padding: 10px;
         border-radius: 8px;
         text-decoration: none;
@@ -136,7 +121,7 @@
         transition: all 0.2s;
     }
     .btn-generate-inline:hover {
-        background-color: #c8e6c9;
+        background-color: var(--primary-light);
     }
 
     .btn-generate-inline svg {

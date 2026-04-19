@@ -1,0 +1,35 @@
+#theme-toggle-container {
+    position: fixed;
+    top: 20px;
+    right: 70px;
+    z-index: 9999;
+}
+
+.dakmode-btn {
+    background: var(--bg); 
+    color: var(--black); 
+    border: 1px solid var(--border-color); 
+    border-radius: 50%; 
+    width: 45px; 
+    height: 45px; 
+    cursor: pointer; 
+    box-shadow: var(--shadow-md);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.5rem;
+    transition: transform 0.2s ease;
+}
+
+.dakmode-btn:hover {
+    transform: scale(1.1);
+}
+@media (max-width: 850px) {
+    
+#theme-toggle-container {
+    position: fixed;
+    top: 800px;
+    right: 20px;
+    z-index: 9999;
+}
+}

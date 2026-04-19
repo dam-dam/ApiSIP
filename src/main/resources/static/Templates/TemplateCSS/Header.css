@@ -12,7 +12,7 @@ header {
     top: 0;
     z-index: 1000;
 
-    box-shadow: 0 4px 12px var(--shadow-brand-logo);
+    box-shadow: 0 4px 12px var(--shadow-md);
     border-bottom-left-radius: 15px;
     border-bottom-right-radius: 15px;
 }
@@ -32,7 +32,7 @@ header {
 .header-brand { display: flex; align-items: center; gap: 1.5rem; }
 .logo-box {
     display: flex; align-items: center; gap: 0.75rem;
-    background: var(--shadow-brand-LogoBox); padding: 0.4rem 0.8rem;
+    background: var(--shadow-brand-overlay); padding: 0.4rem 0.8rem;
     border-radius: 10px; backdrop-filter: blur(10px);
 }
 .logo-img { height: 40px; filter: brightness(0) invert(1); }
@@ -44,7 +44,7 @@ header {
     display: flex; 
     align-items: center; 
     gap: 0.8rem;
-    margin: 0 5rem 0 0; 
+    margin: 0 10rem 0 0; 
 }
 .user-pill {
     display: flex; align-items: center; gap: 0.75rem; background: var(--white);
@@ -52,7 +52,7 @@ header {
     cursor: pointer; box-shadow: 0 4px 6px var(--shadow-brand-UserPill); transition: transform 0.2s;
 }
 .user-pill:hover { transform: scale(1.03); }
-.user-pill span { font-weight: 700; font-size: 0.9rem; }
+.user-pill span { font-weight: 700; font-size: 0.9rem; text-transform: capitalize; }
 .user-avatar { width: 30px; height: 30px; background: var(--primary); color: var(--white); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold; }
 
 .btn-logout {

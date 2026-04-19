@@ -24,7 +24,7 @@
 
 .btn-view {
     background: var(--primary-light);
-    color: var(--primary-dark);
+    color: var(--black);
     border: 1.5px solid var(--primary);
     padding: 0.5rem 1.2rem;
     border-radius: 0.6rem;
@@ -46,6 +46,9 @@
     cursor: pointer;
     font-size: 0.85rem;
     font-weight: 700;
+    background: var(--bg-alternative);
+    color: var(--text-main);
+    transition: all 0.2s;
 }
 
 input[type="radio"] { display: none; }
@@ -60,11 +63,13 @@ input[type="radio"] { display: none; }
     font-size: 0.9rem;
     min-height: 80px;
     outline: none;
+    background: var(--bg-alternative);
+    color: var(--text-main);    
 }
 
 .locked-badge {
     background: var(--success);
-    color: var(--white);
+    color: var(--blanco-blanco);
     padding: 4px 12px;
     border-radius: 50px;
     font-size: 0.7rem;
@@ -86,7 +91,7 @@ input[type="radio"] { display: none; }
     cursor: pointer;
     width: 100%;
     background-color: var(--primary);
-    color: var(--white);
+    color: var(--blanco-blanco);
     padding: .6rem;
     border-radius: 1rem;
     font-size: 0.9rem;

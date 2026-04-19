@@ -73,6 +73,7 @@ input, select {
     transition: border-color 0.2s;
     background: var(--white);
     width: 100%;
+    color: var(--text-main);
 }
 input:focus, select:focus { border-color: var(--primary); background: var(--white); box-shadow: 0 0 0 3px var(--primary-light); }
 
