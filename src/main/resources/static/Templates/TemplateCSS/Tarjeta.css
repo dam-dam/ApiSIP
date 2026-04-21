@@ -129,3 +129,13 @@
         height: 18px;
     }
 
+    /*Clase para carta presentacion el pendirnte de emisor*/
+
+    .pendienteEmision{
+        text-align: center; 
+        color: var(--text-muted); 
+        padding: 1.5rem; 
+        border: 2px dashed var(--black); 
+        border-radius: 0.8rem;
+    }
+

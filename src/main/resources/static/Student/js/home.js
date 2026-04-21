@@ -91,8 +91,8 @@ function renderProgress(apiData, docsData, docsCarts, docsTermino) {
 
     stepper.innerHTML = PHASES.map((name, idx) => {
         const data = apiData[idx] || {};
-        let done = data.date && data.date !== "" && data.date !== "-"; 
         let current = data.isCurrent || false;
+        let done = data.date && data.date !== "" && data.date !== "-"; 
         let displayDate = data.date;
         let customStatus = "";
         const fechaValida = (displayDate && displayDate !== "-") ? displayDate : new Date().toISOString();

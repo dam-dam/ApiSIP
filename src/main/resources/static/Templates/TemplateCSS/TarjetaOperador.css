@@ -17,6 +17,7 @@
     justify-content: space-between;
     align-items: flex-start;
     margin-bottom: 1.2rem;
+    background-color: var(--white);
 }
 
 .doc-name { font-weight: 800; font-size: 1.05rem; }
@@ -83,7 +84,7 @@ input[type="radio"] { display: none; }
     width: 100%;
     display: flex;
     flex-direction: column;
-    align-items: self-start;
+    align-items: end;
     gap: 0.5rem;
 }
 
@@ -96,4 +97,14 @@ input[type="radio"] { display: none; }
     border-radius: 1rem;
     font-size: 0.9rem;
     text-align: center;
+}
+
+/*Boton Guardar cambios de la tarjeta carta presentacion*/
+.btn-submit{
+    background-color: var(--primary);
+    padding: .7rem;
+    border-radius: .5rem;
+    color: var(--text-main);
+    margin-left: 27rem;
+
 }

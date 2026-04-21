@@ -39,7 +39,7 @@ function crearTarjetaDocumento(doc, dataRaw = {}, extraActionHtml = "", mostrarO
                 </p>
             </div>
         ` : `
-            <div class="column-item" style="text-align: center; color: var(--text-muted); padding: 1.5rem; border: 2px dashed var(--border); border-radius: 0.8rem;">
+            <div class="column-item pendienteEmision">
                 <i class="fas fa-clock"></i> Pendiente de emisión por el operador.
             </div>
         `;
