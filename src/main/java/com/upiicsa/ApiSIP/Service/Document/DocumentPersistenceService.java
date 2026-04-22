@@ -38,8 +38,10 @@ public class DocumentPersistenceService {
     }
 
     @Transactional(readOnly = true)
-    public List<Document> findByProcessAndStatus(ProcessStatus status){
-        return documentRepository.findByProcessAndCancelDateIsNull(status);
+    public List<Document> findByProcessAndStatus(StudentProcess process){
+        return documentRepository.findByProcessAndCancelDateIsNull(
+                process.getProcessStatus(), process.getId()
+        );
     }
 
     @Transactional(readOnly = true)

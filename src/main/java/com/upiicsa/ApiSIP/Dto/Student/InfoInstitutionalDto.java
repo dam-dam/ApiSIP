@@ -13,6 +13,7 @@ public record InfoInstitutionalDto(
 ) {
     public InfoInstitutionalDto(Student s, StudentProcess p){
         this(s.getPhone(), s.getEnrollment(), s.getOffer().getCareer().getName(), s.getOffer().getSyllabus().code,
-                s.getSemester().getDescription(), p.getProcessStatus().getDescription());
+                s.getSemester() == null ? "--" : s.getSemester().getDescription(),
+                p.getProcessStatus().getDescription());
     }
 }

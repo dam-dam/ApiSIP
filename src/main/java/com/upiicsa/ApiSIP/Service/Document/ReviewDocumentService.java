@@ -77,7 +77,7 @@ public class ReviewDocumentService {
                 save(doc, user, dto.approved(), dto.comment());
             }
         }
-        processService.validateUpdateStatus(process, documentPersistence.findByProcessAndStatus(process.getProcessStatus()));
+        processService.validateUpdateStatus(process, documentPersistence.findByProcessAndStatus(process));
         log.info("Operador ID [{}] finalizo la revisión para la matrícula [{}]", userId, enrollment);
     }
 }

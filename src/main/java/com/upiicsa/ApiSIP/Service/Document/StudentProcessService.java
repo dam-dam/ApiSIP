@@ -15,6 +15,7 @@ import com.upiicsa.ApiSIP.Repository.Document_Process.DocumentProcessRepository;
 import com.upiicsa.ApiSIP.Repository.Document_Process.StudentProcessRepository;
 import com.upiicsa.ApiSIP.Repository.StudentRepository;
 import com.upiicsa.ApiSIP.Service.HistoryService;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -26,6 +27,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+@Slf4j
 @Service
 public class StudentProcessService {
 
@@ -71,10 +73,10 @@ public class StudentProcessService {
                 .startDate(LocalDateTime.now())
                 .student(student)
                 .processStatus(status)
-                .reasonLeaving(null)
                 .build();
 
         processRepository.save(firstProcess);
+        log.info("Sistema ejecuto Primer estado para el Proceso ID[{}]", firstProcess.getId());
     }
 
     @Transactional
@@ -89,10 +91,13 @@ public class StudentProcessService {
         historyService.saveHistory(process, process.getProcessStatus(), newStatus);
         process.setProcessStatus(newStatus);
         processRepository.save(process);
+        log.info("Sistema ejecuto cambio del Estado de Proceso ID[{}] de [{}] a [{}]", process.getId(),
+                currentState.getName(), newStatus.getDescription());
     }
 
     @Transactional
     public void validateUpdateStatus(StudentProcess process, List<Document> docs) {
+        log.info("Validando la actualizacion del Estado de Proceso ID[{}]...", process.getId());
         int countedTrue = 0;
         int numberOfNeed = docProcessRepository.countByProcessStatus(process.getProcessStatus());
 
@@ -104,9 +109,12 @@ public class StudentProcessService {
         if(!docs.isEmpty() && docs.size() == numberOfNeed){
             if(countedTrue == docs.size()){
                 updateStatus(process);
+                log.info("Cambio de para el Proceso ID[{}] Valido",  process.getId());
             }else {
-                throw new BusinessException(ErrorCode.INTERNAL_ERROR);
+                log.info("Cambio de para el Proceso ID[{}] Invalido",  process.getId());
             }
+        }else {
+            log.info("Fallo, info: -Number need [{}] -Docs Size [{}]", numberOfNeed, docs.size());
         }
     }
 
