@@ -2,9 +2,11 @@ package com.upiicsa.ApiSIP.Service.Infrastructure;
 
 import com.upiicsa.ApiSIP.Exception.BusinessException;
 import com.upiicsa.ApiSIP.Model.Enum.ErrorCode;
+import org.jspecify.annotations.NonNull;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -19,6 +21,7 @@ public class EmailService {
         this.mailSender = mailSender;
     }
 
+    @Async("emailExecutor")
     public void sendResetEmail(String toEmail, String resetUrl) {
         SimpleMailMessage message = new SimpleMailMessage();
 
@@ -42,7 +45,21 @@ public class EmailService {
         }
     }
 
+    @Async("emailExecutor")
     public void sendConfirmationCode(String toEmail, String code) {
+        SimpleMailMessage message = getSimpleMailMessage(toEmail, code);
+        System.out.println(">>> [ASYNC] Intentando enviar a: " + toEmail);
+        try {
+            mailSender.send(message);
+            System.out.println(">>> [ASYNC] Correo enviado exitosamente");
+        } catch (Exception e) {
+            //throw new BusinessException(ErrorCode.EMAIL_SEND_FAILED);
+            System.err.println(">>> [ASYNC] ERROR al enviar: " + e.getMessage());
+            e.printStackTrace();
+        }
+    }
+
+    private @NonNull SimpleMailMessage getSimpleMailMessage(String toEmail, String code) {
         SimpleMailMessage message = new SimpleMailMessage();
 
         message.setFrom(email);
@@ -57,11 +74,6 @@ public class EmailService {
                 + "Tu equipo de Soporte.";
 
         message.setText(emailContent);
-
-        try {
-            mailSender.send(message);
-        } catch (Exception e) {
-            throw new BusinessException(ErrorCode.EMAIL_SEND_FAILED);
-        }
+        return message;
     }
 }

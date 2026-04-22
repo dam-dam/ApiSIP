@@ -23,8 +23,9 @@ public interface DocumentRepository extends JpaRepository<Document, Integer> {
             (StudentProcess process, DocumentType type);
 
     @Query("SELECT d FROM Document d JOIN DocumentProcess dp ON d.documentType.id = dp.documentType.id " +
-            "WHERE dp.processStatus = :status AND d.documentStatus.id = 2 AND d.cancellationDate IS NULL")
-    List<Document> findByProcessAndCancelDateIsNull(@Param("status") ProcessStatus status);
+            "WHERE dp.processStatus = :status AND d.studentProcess.id = :idProcess AND d.cancellationDate IS NULL")
+    List<Document> findByProcessAndCancelDateIsNull(@Param("status") ProcessStatus status,
+                                                    @Param("idProcess")  Integer idProcess);
 
     Integer countByStudentProcessAndDocumentType(StudentProcess process, DocumentType type);
 
