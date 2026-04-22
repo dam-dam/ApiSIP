@@ -14,7 +14,7 @@ document.addEventListener('DOMContentLoaded', () => {
     renderUniversalHeader('students');
     volverAtras(); 
     tituloFijo(
-        "Documentación Inicial",
+        "Documentación para finalizar",
         "Por favor, carga tus archivos en formato PDF. Peso no mayor a 1MB."
     );
     initUI();

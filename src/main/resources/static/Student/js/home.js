@@ -97,7 +97,22 @@ function renderProgress(apiData, docsData, docsCarts, docsTermino) {
         let customStatus = "";
         const fechaValida = (displayDate && displayDate !== "-") ? displayDate : new Date().toISOString();
 
+        const etapaActivaBackend = apiData.find(d => d.isCurrent)?.stageName || "";
+
         // --- LÓGICA PARA FASE 0 (Registrado) ---
+        if (idx === 0) {
+        if (etapaActivaBackend !== "REGISTRADO") { // Si ya no es la actual, es porque ya pasó
+            done = true;
+            current = false;
+        } else {
+            done = false;
+            current = true;
+            customStatus = `Inició: ${fmt(fechaValida)}`;
+        }
+    }
+
+    // --- LÓGICA PARA FASE 1 (Doc Inicial) ---
+    
         if (idx === 0) {
             if (haSubidoAlgo) {
                 done = true;
@@ -187,15 +202,15 @@ function renderProgress(apiData, docsData, docsCarts, docsTermino) {
         `;
     }).join('');
 
-    if (todoAprobadoRealTermino) {
-        nuevoStatusCalculado = 'LIBERACION';
-    } else if (todoAprobadoRealCarts) {
-        nuevoStatusCalculado = 'DOC_FINAL';
-    } else if (todoAprobadoReal) {
-        nuevoStatusCalculado = 'CARTAS';
-    }
+    // if (todoAprobadoRealTermino) {
+    //     nuevoStatusCalculado = 'LIBERACION';
+    // } else if (todoAprobadoRealCarts) {
+    //     nuevoStatusCalculado = 'DOC_FINAL';
+    // } else if (todoAprobadoReal) {
+    //     nuevoStatusCalculado = 'CARTAS';
+    // }
 
-    localStorage.setItem('currentProcessStatus', nuevoStatusCalculado);
+    // localStorage.setItem('currentProcessStatus', nuevoStatusCalculado);
     actualizarTarjetas(todoAprobadoReal, todoAprobadoRealCarts, todoAprobadoRealTermino);
     console.log(todoAprobadoReal);
     console.log(todoAprobadoRealCarts);
