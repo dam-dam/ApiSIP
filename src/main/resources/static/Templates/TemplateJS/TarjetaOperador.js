@@ -67,7 +67,7 @@ function TarjetaOperador(doc, options = {}) {
                     <span class="doc-date">${uploadDateStr}</span>
                 </div>
                 <div style="display:flex; gap:0.8rem; align-items:center;">
-                    ${isRevisado ? '<span class="locked-badge">Revisado Correcto</span>' : ''}
+                    ${isRevisado ? '<span class="locked-badge">Correcto</span>' : ''}
                     ${isIncorrecto ? '<span class="locked-badge" style="background:var(--error);">Corrección Solicitada</span>' : ''}
                     
                     <button class="btn-view" ${!hasFile ? 'disabled style="opacity:0.5; cursor:not-allowed;"' : ''}>

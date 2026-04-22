@@ -25,9 +25,8 @@ header {
 }
 
 .school-logo-img {
-    height: 4rem;
-    width: 10rem;
-
+    height: clamp(3rem, 4rem, 5rem);
+    width: clamp(5rem, 10rem, 11rem);
 }
 .header-brand { display: flex; align-items: center; gap: 1.5rem; }
 .logo-box {
@@ -76,5 +75,9 @@ header {
         justify-content: end;  
         margin: 0; 
     }
+    .school-logo-img {
+    height: clamp(1rem, 3rem, 5rem);
+    width: clamp(2rem, 5rem, 11rem);
+}
 
 }

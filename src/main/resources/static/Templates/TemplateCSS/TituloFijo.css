@@ -27,3 +27,12 @@
     color: var(--text-muted);
     margin-top: 0.25rem;
 }
+
+@media (max-width: 768px) {
+    .page-intro{
+        top: 130px;
+        position:static;
+        margin: 0 0 0 1rem;
+        padding: 0 0 0 .5rem;
+    }
+}

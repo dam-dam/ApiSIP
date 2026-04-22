@@ -20,8 +20,15 @@
     background-color: var(--white);
 }
 
-.doc-name { font-weight: 800; font-size: 1.05rem; }
-.doc-date { font-size: 0.75rem; color: var(--text-muted); display: flex; align-items: center; gap: 0.3rem; margin-top: 0.3rem; }
+.doc-name { font-weight: 800; font-size: clamp(0.89rem, 3vw, 1.1rem); }
+.doc-date { 
+    font-size:  clamp(0.5rem, 0.6rem, 1rem); 
+    color: var(--text-muted); 
+    display: flex; 
+    align-items: center; 
+    gap: 0.3rem; 
+    margin-top: 0.3rem; 
+}
 
 .btn-view {
     background: var(--primary-light);
@@ -73,7 +80,7 @@ input[type="radio"] { display: none; }
     color: var(--blanco-blanco);
     padding: 4px 12px;
     border-radius: 50px;
-    font-size: 0.7rem;
+    font-size: clamp(0.4rem, 0.7rem, 1rem);
     font-weight: 800;
     text-transform: uppercase;
 }
@@ -107,4 +114,21 @@ input[type="radio"] { display: none; }
     color: var(--text-main);
     margin-left: 27rem;
 
+}
+@media (max-width: 768px) {
+    .doc-header{
+        align-items: center;
+        margin-bottom: 0;
+        padding: 0;
+    }
+    .btn-submit{
+        width: 100%;
+        margin: 0;
+    }
+    .doc-date{
+        font-size: clamp(0.4rem, 0.6rem, 1rem);
+    }
+    .locked-badge{
+        font-size: clamp(0.2rem, 0.5rem, 1rem)
+    }
 }

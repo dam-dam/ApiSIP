@@ -47,7 +47,7 @@ function crearTarjetaDocumento(doc, dataRaw = {}, extraActionHtml = "", mostrarO
         zonaAccionHtml = `
             <div class="column-item">
                 <input type="file" id="file-${doc.id}" style="display:none" accept=".pdf" ${statusClass === 'correct' ? 'disabled' : ''}>
-                <label for="file-${doc.id}" class="btn-browse ${statusClass === 'correct' ? 'disabled' : ''}" id="btn-${doc.id}" style="text-align: center; display: block;">
+                <label for="file-${doc.id}" class="btn-browse ${statusClass === 'correct' ? 'disabled' : ''}" id="btn-${doc.id}" >
                     <i class="fas fa-file-upload"></i> Seleccionar PDF
                 </label>
                 ${verDocHtml}
@@ -55,7 +55,7 @@ function crearTarjetaDocumento(doc, dataRaw = {}, extraActionHtml = "", mostrarO
         `;
     }
 
-    const gridStyle = mostrarObservaciones ? 'display: grid; grid-template-columns: 1.2fr 1fr; gap: 2rem;' : 'display: block;';
+    const gridStyle = mostrarObservaciones ? 'siObservaciones' : 'noObservaciones';
 
     // IMPORTANTE: Aquí se inyectan las clases status-correct y badge-correct
     return `
@@ -63,13 +63,13 @@ function crearTarjetaDocumento(doc, dataRaw = {}, extraActionHtml = "", mostrarO
             <div class="doc-header">
                 <div class="title-group">
                     <span class="doc-title">${doc.label}</span>
-                    <div id="date-${doc.id}" class="doc-date" style="font-size: 0.8rem; color: var(--text-muted); margin-top: 4px;">${fechaFmt}</div>
+                    <div id="date-${doc.id}" class="doc-date" >${fechaFmt}</div>
                 </div>
                 <span class="status-badge badge-${statusClass}" id="badge-${doc.id}">${statusBadge}</span>
             </div>
 
-            <div class="doc-body-flex" style="${gridStyle} padding: 1.5rem;">
-                <div class="upload-area" style="display: flex; gap: 1rem; align-items: flex-start;">
+            <div class="doc-body-flex ${gridStyle}" padding: 1.5rem;">
+                <div class="upload-area" >
                     <div style="flex: 1;">${zonaAccionHtml}</div>
                     ${extraActionHtml ? `<div style="flex: 1;">${extraActionHtml}</div>` : ''}
                 </div>

@@ -32,4 +32,15 @@
 .btn-blue { background: var(--info); color: var(--white); }
 .btn-green { background: var(--primary); color: var(--white);} 
 
+@media (max-width: 768px) {
+    .bottom-actions{
+        padding: 0;
+        width: 100%;
+    }
+    .btn-footer{
+        padding: .9rem;
+        width: 100%;
+    }
+}
+
 
